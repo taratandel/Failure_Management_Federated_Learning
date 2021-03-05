@@ -9,11 +9,10 @@ import matplotlib.pyplot as plt
 import sklearn.metrics as mt
 from sklearn.metrics import roc_auc_score, roc_curve
 import time
-
+import joblib
 # Environmental settings
 pd.options.mode.chained_assignment = None
 np.set_printoptions(threshold=np.inf)
-
 
 # ----------------------------------------------- CONFUSION MATRIX PLOT -----------------------------------------------
 def plot_confusion_matrix(y_true, y_pred, classes,
@@ -75,7 +74,7 @@ def plot_confusion_matrix(y_true, y_pred, classes,
 
 # --------------------------------------------------- OPEN THE FILES ---------------------------------------------------
 # CSV file from which we take the dataframe containing our data
-windows = pd.read_csv(r"df1.csv")
+windows = pd.read_csv(r"df2.csv")
 # Txt file in which the model selection results will be saved
 result = open("RF_model_selection_results.txt", "w")
 # ----------------------------------------------------------------------------------------------------------------------
@@ -178,70 +177,70 @@ Best_score = 0  # Best cross validation score of a certain model
 Best_layers = 0  # Best number of layers
 Best_neurons = 0  # Best number of neurons
 Best_activation = ""  # Best activation function
-for activation in ['identity', 'logistic', 'tanh', 'relu']:  # Loop over activation functions
-    for neurons in [10, 50, 100]:  # Loop over the number of neurons per layer
-        for layers in range(1, 4):  # Loop over the number of hidden layers
-            comb += 1
-            print("Progress ----> ", comb, "/36")
-            score = 0
-            for train_index, test_index in skf.split(X_train, y_train):  # Loop over the cross validation folds
-
-                # Pick the input data for the training and validation sets
-                X_train_val, X_val = X_train[train_index], X_train[test_index]
-                # Pick the labels for the training and validation sets
-                y_train_val, y_val = y_train[train_index], y_train[test_index]
-
-                # ------------------------------------- Scale the data (Automated) -------------------------------------
-                X_train_val = scaler.fit_transform(X_train_val)  # Scale the train data as (value - mean) / std
-                X_val = scaler.transform(X_val)  # scale the validation data as (value - mean_train) / std_train
-                # ------------------------------------------------------------------------------------------------------
-
-                # ------------------------------------- Scale the data (Manually) -------------------------------------
-                # mean_train = np.mean(X_train_val, axis=0)  # Mean per feature of the training data
-                # std_train = np.std(X_train_val, axis=0)  # Std per feature of the training data
-                # X_train_val = (X_train_val-mean_train) / std_train  # Scaling training data
-                # X_val = (X_val-mean_train) / std_train  # Scaling validation data
-                # ------------------------------------------------------------------------------------------------------
-
-                # Transform the labels using One-Hot-Encoding (O-H-E)
-                # e.g., Total number of label = 6 (from 0 to 5),
-                # Selected label = 2 ---O-H-E----> Selected label = [0, 0, 1, 0, 0, 0]
-                y_train_cat = to_categorical(y_train_val, num_classes=n_label)
-                y_val_cat = to_categorical(y_val, num_classes=n_label)
-
-                # Create the object of the model that must be tested
-                size = (neurons,) * layers  # Create the structure of the Artificial Neural Network
-                ann = MLPClassifier(hidden_layer_sizes=size, activation=activation,
-                                    solver='adam', learning_rate='invscaling', max_iter=10000)
-                # Train the model
-                ann.fit(X_train_val, y_train_cat)
-                # Compute the validation score
-                score += ann.score(X_val, y_val_cat)
-            # Compute the cross validation score
-            score = score / n_split_kfold
-            # Check if the cross-validation score is higher wrt the previous best score
-            if Best_score < score:
-                Best_score = score  # Put the new best score in the variable
-                Best_layers = layers  # New best number of layers
-                Best_neurons = neurons  # New best number of neurons
-                Best_activation = activation  # New best activation function
-
-# Write the model selection results in the file
-result.write("Layers : %s\n" % Best_layers)
-result.write("Neurons : %s\n" % Best_neurons)
-result.write("Activation : %s\n" % Best_activation)
-result.write("Cross-Validation accuracy : %s \n" % Best_score)
-
-result.close()
+# for activation in ['identity', 'logistic', 'tanh', 'relu']:  # Loop over activation functions
+#     for neurons in [10, 50, 100]:  # Loop over the number of neurons per layer
+#         for layers in range(1, 4):  # Loop over the number of hidden layers
+#             comb += 1
+#             print("Progress ----> ", comb, "/36")
+#             score = 0
+#             for train_index, test_index in skf.split(X_train, y_train):  # Loop over the cross validation folds
+#
+#                 # Pick the input data for the training and validation sets
+#                 X_train_val, X_val = X_train[train_index], X_train[test_index]
+#                 # Pick the labels for the training and validation sets
+#                 y_train_val, y_val = y_train[train_index], y_train[test_index]
+#
+#                 # ------------------------------------- Scale the data (Automated) -------------------------------------
+#                 X_train_val = scaler.fit_transform(X_train_val)  # Scale the train data as (value - mean) / std
+#                 X_val = scaler.transform(X_val)  # scale the validation data as (value - mean_train) / std_train
+#                 # ------------------------------------------------------------------------------------------------------
+#
+#                 # ------------------------------------- Scale the data (Manually) -------------------------------------
+#                 # mean_train = np.mean(X_train_val, axis=0)  # Mean per feature of the training data
+#                 # std_train = np.std(X_train_val, axis=0)  # Std per feature of the training data
+#                 # X_train_val = (X_train_val-mean_train) / std_train  # Scaling training data
+#                 # X_val = (X_val-mean_train) / std_train  # Scaling validation data
+#                 # ------------------------------------------------------------------------------------------------------
+#
+#                 # Transform the labels using One-Hot-Encoding (O-H-E)
+#                 # e.g., Total number of label = 6 (from 0 to 5),
+#                 # Selected label = 2 ---O-H-E----> Selected label = [0, 0, 1, 0, 0, 0]
+#                 y_train_cat = to_categorical(y_train_val, num_classes=n_label)
+#                 y_val_cat = to_categorical(y_val, num_classes=n_label)
+#
+#                 # Create the object of the model that must be tested
+#                 size = (neurons,) * layers  # Create the structure of the Artificial Neural Network
+#                 ann = MLPClassifier(hidden_layer_sizes=size, activation=activation,
+#                                     solver='adam', learning_rate='invscaling', max_iter=10000)
+#                 # Train the model
+#                 ann.fit(X_train_val, y_train_cat)
+#                 # Compute the validation score
+#                 score += ann.score(X_val, y_val_cat)
+#             # Compute the cross validation score
+#             score = score / n_split_kfold
+#             # Check if the cross-validation score is higher wrt the previous best score
+#             if Best_score < score:
+#                 Best_score = score  # Put the new best score in the variable
+#                 Best_layers = layers  # New best number of layers
+#                 Best_neurons = neurons  # New best number of neurons
+#                 Best_activation = activation  # New best activation function
+#
+# # Write the model selection results in the file
+# result.write("Layers : %s\n" % Best_layers)
+# result.write("Neurons : %s\n" % Best_neurons)
+# result.write("Activation : %s\n" % Best_activation)
+# result.write("Cross-Validation accuracy : %s \n" % Best_score)
+#
+# result.close()
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------- END COMMENT HERE IF YOU ALREADY HAVE THE HYPER-PARAMETERS -----------------------------
 # ----------------------------------------------------TESTING PHASE----------------------------------------------------
 
 # Hyperparameters to set according to the model selection result
 # if the hyperparameters are given the model selection part must be commented as reported in the previous comments
-# Best_layers = 3
-# Best_neurons = 100
-# Best_activation = "tanh"
+Best_layers = 3
+Best_neurons = 100
+Best_activation = "tanh"
 
 # Scale the data (Manually)
 # mean_train = np.mean(X_train, axis=0)  # Mean per feature of the training data
@@ -268,6 +267,7 @@ Tick = time.time()  # Take the time before the training
 ann.fit(X_train, y_train_cat)
 
 #  here I should return the weights of the ann 
+joblib.dump(ann, "ann2.sav")
 
 Tock = time.time() - Tick  # Calculate the training time
 # Predict the label on the test set
@@ -282,7 +282,7 @@ y_probability = ann.predict_proba(X_test)
 # ------------------------------------------ SAVE THE PERFORMANCES PER CLASS ------------------------------------------
 
 # Open the file where will be saved all the test performances
-performances = open("Performances_result_ANN.txt", "w")
+performances = open("Performances_result_ANN2.txt", "w")
 acc = pd.DataFrame()  # create a structure to perform the measure manually
 acc['ground_truth'] = y_test  # add the ground truth
 acc['predicted'] = y_predicted  # add the predicted labels
@@ -293,7 +293,7 @@ performances.write("Training Time(s): %s \n" % str(Tock))  # Print the training 
 #                                 --------------------- AUTOMATED ---------------------
 
 # Write the accuracy inside the performances file
-performances.write("Accuracy automated: %s \n" % mt.classification.accuracy_score(y_test, y_predicted))
+performances.write("Accuracy automated: %s \n" % mt.accuracy_score(y_test, y_predicted))
 #                                 --------------------- MANUALLY ---------------------
 
 # Write the accuracy inside the performances file
@@ -305,20 +305,20 @@ performances.write("Accuracy manually: %s \n" % str(len(acc.loc[acc['ground_trut
 
 # Write the precision inside the performances file
 performances.write("Precision per class automated: %s \n"
-                   % mt.classification.precision_score(y_test, y_predicted, labels=labels, average=None))
+                   % mt.precision_score(y_test, y_predicted, labels=labels, average=None))
 #                                 --------------------- MANUALLY ---------------------
 
 # Write the precision inside the performances file
-performances.write("\nPrecision per class manually: \n")
-for i in range(n_label):
-    performances.write("Class number %s \n" % str(i))
-    human = acc.loc[acc['predicted'] == i]['ground_truth']  # we pick all the ground truth in a list
-    predicted = acc.loc[acc['predicted'] == i]['predicted']  # we pick the label assigned to the clustering
-    measure = pd.DataFrame()
-    measure['ground_truth'] = human
-    measure['predicted'] = predicted
-    precision[i] = len(measure.loc[measure['ground_truth'] == measure['predicted']]) / len(measure)
-    performances.write("Precision: %s \n\n" % precision[i])
+# performances.write("\nPrecision per class manually: \n")
+# for i in range(n_label):
+#     performances.write("Class number %s \n" % str(i))
+#     human = acc.loc[acc['predicted'] == i]['ground_truth']  # we pick all the ground truth in a list
+#     predicted = acc.loc[acc['predicted'] == i]['predicted']  # we pick the label assigned to the clustering
+#     measure = pd.DataFrame()
+#     measure['ground_truth'] = human
+#     measure['predicted'] = predicted
+#     precision[i] = len(measure.loc[measure['ground_truth'] == measure['predicted']]) / len(measure)
+#     performances.write("Precision: %s \n\n" % precision[i])
 #           --------------------------------------------------------------------------------------------------
 
 #           -------------------------------------------- RECALL --------------------------------------------
@@ -326,7 +326,7 @@ for i in range(n_label):
 
 # Write the recall inside the performances file
 performances.write("Recall per class automated: %s \n"
-                   % mt.classification.recall_score(y_test, y_predicted, labels=labels, average=None))
+                   % mt.recall_score(y_test, y_predicted, labels=labels, average=None))
 #                                 --------------------- MANUALLY ---------------------
 
 # Write the recall inside the performances file
@@ -347,15 +347,15 @@ for i in range(n_label):
 
 # Write the f1-score inside the performances file
 performances.write("F1-score automated: %s \n"
-                   % mt.classification.f1_score(y_test, y_predicted, labels=labels, average=None))
+                   % mt.f1_score(y_test, y_predicted, labels=labels, average=None))
 #                                 --------------------- MANUALLY ---------------------
 
 # Write the f1-score inside the performances file
-performances.write("\nF1-score per class manually: \n")
-for i in range(n_label):
-    performances.write("Class number %s \n" % str(i))
-    f1score = 2 * (precision[i] * recall[i]) / (precision[i] + recall[i])
-    performances.write("Recall: %s \n\n" % f1score)
+# performances.write("\nF1-score per class manually: \n")
+# for i in range(n_label):
+#     performances.write("Class number %s \n" % str(i))
+#     f1score = 2 * (precision[i] * recall[i]) / (precision[i] + recall[i])
+#     performances.write("Recall: %s \n\n" % f1score)
 #           --------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------------------------

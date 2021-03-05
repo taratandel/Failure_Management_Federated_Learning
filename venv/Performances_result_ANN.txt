@@ -1,0 +1,66 @@
+Training Time(s): 4.501298666000366 
+Accuracy automated: 0.901595744680851 
+Accuracy manually: 0.901595744680851 
+Precision per class automated: [0.70175439 0.89830508 1.         0.90322581 0.96969697 0.96946565] 
+
+Precision per class manually: 
+Class number 0 
+Precision: 0.7017543859649122 
+
+Class number 1 
+Precision: 0.8983050847457628 
+
+Class number 2 
+Precision: 1.0 
+
+Class number 3 
+Precision: 0.9032258064516129 
+
+Class number 4 
+Precision: 0.9696969696969697 
+
+Class number 5 
+Precision: 0.9694656488549618 
+
+Recall per class automated: [0.86956522 0.92173913 0.75       0.75675676 1.         0.92028986] 
+
+Recall per class manually: 
+Class number 0 
+Recall: 0.8695652173913043 
+
+Class number 1 
+Recall: 0.9217391304347826 
+
+Class number 2 
+Recall: 0.75 
+
+Class number 3 
+Recall: 0.7567567567567568 
+
+Class number 4 
+Recall: 1.0 
+
+Class number 5 
+Recall: 0.9202898550724637 
+
+F1-score automated: [0.77669903 0.90987124 0.85714286 0.82352941 0.98461538 0.94423792] 
+
+F1-score per class manually: 
+Class number 0 
+Recall: 0.7766990291262136 
+
+Class number 1 
+Recall: 0.9098712446351932 
+
+Class number 2 
+Recall: 0.8571428571428571 
+
+Class number 3 
+Recall: 0.823529411764706 
+
+Class number 4 
+Recall: 0.9846153846153847 
+
+Class number 5 
+Recall: 0.9442379182156133 
+
