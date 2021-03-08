@@ -9,8 +9,11 @@ from scipy.spatial.distance import cdist, pdist
 class DataDivider:
     df = pd.DataFrame()
 
-    def __init__(self, nameOfTheFile):
-        loadDataFrame(nameOfTheFile)
+    def __init__(self, nameOfTheFile=None, dataFrame=None):
+        if dataFrame != None:
+            self.df = dataFrame
+        else:
+            loadDataFrame(nameOfTheFile)
 
     def loadDataFrame(self, nameOfTheFile):
         self.df = pd.read_csv(nameOfTheFile)
@@ -29,3 +32,7 @@ class DataDivider:
 
         return dataFrames
 
+    def oneHotEncode(self):
+        y = self.df.pop('label')
+        y = y.to_numpy()
+        y_train_cat = to_categorical(y_train, num_classes=n_label)

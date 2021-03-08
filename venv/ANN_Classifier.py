@@ -70,13 +70,17 @@ def plot_confusion_matrix(y_true, y_pred, classes,
 
 # Code provided by: https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
 # ----------------------------------------------------------------------------------------------------------------------
-
+i = 3
+fileName = "df" + str(i) + ".csv"
+resultName = "ANN_model_selection_results" + str(i) + ".txt"
+modelName = "Ann" + str(i) + ".sav"
+performanceName = "Performances_result_ANN" + str(i) + ".txt"
 
 # --------------------------------------------------- OPEN THE FILES ---------------------------------------------------
 # CSV file from which we take the dataframe containing our data
-windows = pd.read_csv(r"df2.csv")
+windows = pd.read_csv(fileName)
 # Txt file in which the model selection results will be saved
-result = open("RF_model_selection_results.txt", "w")
+result = open(resultName, "w")
 # ----------------------------------------------------------------------------------------------------------------------
 
 # ------------------------------------------------ DATA PRE-PROCESSING ------------------------------------------------
@@ -105,9 +109,9 @@ y = windows['label'].to_numpy()
 # y[index_zero] = 0  # Define the well defined as negative
 # ----------------------------------------------------------------------------------------------------------------------
 # Calculate the number of distinct labels
-n_label = len(set(y))
+n_label = 6
 # Have a list of all the distinct labels
-labels = list(set(y))
+labels = [0.0,1.0,2.0,3.0,4.0,5.0]
 
 #            ------------------------------------------------------------------------------------------------
 
@@ -267,7 +271,7 @@ Tick = time.time()  # Take the time before the training
 ann.fit(X_train, y_train_cat)
 
 #  here I should return the weights of the ann 
-joblib.dump(ann, "ann2.sav")
+joblib.dump(ann, modelName)
 
 Tock = time.time() - Tick  # Calculate the training time
 # Predict the label on the test set
@@ -282,7 +286,7 @@ y_probability = ann.predict_proba(X_test)
 # ------------------------------------------ SAVE THE PERFORMANCES PER CLASS ------------------------------------------
 
 # Open the file where will be saved all the test performances
-performances = open("Performances_result_ANN2.txt", "w")
+performances = open(performanceName, "w")
 acc = pd.DataFrame()  # create a structure to perform the measure manually
 acc['ground_truth'] = y_test  # add the ground truth
 acc['predicted'] = y_predicted  # add the predicted labels
@@ -328,18 +332,18 @@ performances.write("Precision per class automated: %s \n"
 performances.write("Recall per class automated: %s \n"
                    % mt.recall_score(y_test, y_predicted, labels=labels, average=None))
 #                                 --------------------- MANUALLY ---------------------
-
-# Write the recall inside the performances file
-performances.write("\nRecall per class manually: \n")
-for i in range(n_label):
-    performances.write("Class number %s \n" % str(i))
-    human = acc.loc[acc['ground_truth'] == i]['ground_truth']  # we pick all the ground truth in a list
-    predicted = acc.loc[acc['ground_truth'] == i]['predicted']  # we pick the label assigned to the clustering
-    measure = pd.DataFrame()
-    measure['ground_truth'] = human
-    measure['predicted'] = predicted
-    recall[i] = len(measure.loc[measure['ground_truth'] == measure['predicted']]) / len(measure)
-    performances.write("Recall: %s \n\n" % recall[i])
+#
+# # Write the recall inside the performances file
+# performances.write("\nRecall per class manually: \n")
+# for i in range(n_label):
+#     performances.write("Class number %s \n" % str(i))
+#     human = acc.loc[acc['ground_truth'] == i]['ground_truth']  # we pick all the ground truth in a list
+#     predicted = acc.loc[acc['ground_truth'] == i]['predicted']  # we pick the label assigned to the clustering
+#     measure = pd.DataFrame()
+#     measure['ground_truth'] = human
+#     measure['predicted'] = predicted
+#     recall[i] = len(measure.loc[measure['ground_truth'] == measure['predicted']]) / len(measure)
+#     performances.write("Recall: %s \n\n" % recall[i])
 #           --------------------------------------------------------------------------------------------------
 
 #           -------------------------------------------- F1-SCORE --------------------------------------------
