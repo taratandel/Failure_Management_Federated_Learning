@@ -14,8 +14,10 @@ import joblib
 pd.options.mode.chained_assignment = None
 np.set_printoptions(threshold=np.inf)
 
+from data_divider import *
+
 # ----------------------------------------------- CONFUSION MATRIX PLOT -----------------------------------------------
-def plot_confusion_matrix(y_true, y_pred, classes,
+def plot_confusion_matrix(y_true, y_pred, classes = [],
                           normalize=False,
                           title=None,
                           cmap=plt.cm.Blues):
@@ -32,7 +34,7 @@ def plot_confusion_matrix(y_true, y_pred, classes,
     # Compute confusion matrix
     cm = confusion_matrix(y_true, y_pred)
     # Only use the labels that appear in the data
-    classes = classes
+    classes = list(set(y_test))
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         print("Normalized confusion matrix")
@@ -78,7 +80,11 @@ performanceName = "Performances_result_ANN" + str(i) + ".txt"
 
 # --------------------------------------------------- OPEN THE FILES ---------------------------------------------------
 # CSV file from which we take the dataframe containing our data
-windows = pd.read_csv(fileName)
+# windows = pd.read_csv("Labelled_Data.csv")
+dd = DataDivider(nameOfTheFile="Labelled_Data.csv")
+dd.oneHotEncode()
+dfs = dd.divideByeqType()
+windows = dfs[i - 1]
 # Txt file in which the model selection results will be saved
 result = open(resultName, "w")
 # ----------------------------------------------------------------------------------------------------------------------
@@ -92,7 +98,6 @@ tx = ['txMaxAN-2', 'txminAN-2', 'txMaxBN-2', 'txminBN-2', 'txMaxAN-1', 'txminAN-
 # Fill the Nan value in the Tx power features with 100
 windows[tx] = windows[tx].fillna(100)
 # Fill the Nan value in the Rx power features with -150
-windows = windows.fillna(-150)
 # We use two different values because in this problem the Tx power and the Rx power have two different range of values,
 # when we will normalize the data (Some steps below) if the added values are too big this can eliminate the differences
 # in the data values
@@ -100,7 +105,9 @@ windows = windows.fillna(-150)
 
 #           ---------------------------------------- LABELS PROCESSING ----------------------------------------
 # Put the labels inside a variable
-y = windows['label'].to_numpy()
+y = windows[windows.columns.values[-6:]].to_numpy()
+windows = windows.fillna(-150)
+
 # ----------------------------------------------------------------------------------------------------------------------
 # BINARY PROBLEM SETTINGS
 # index_zero = np.where(y != 5)  # Indexes of the well defined classes
@@ -133,8 +140,9 @@ columns = windows.columns.values
 # The variable is used to address and drop some features not useful in the training and cross-validation phase
 # Delete the columns that are not useful
 windows = windows.drop(columns=columns[:8])
+windows = windows.drop(columns=columns[-6:])
 # Delete the 'label' columns because we can't train a model using it as an input data
-windows = windows.drop(columns=['label'])
+# windows = windows.drop(columns=['label'])
 # After the elimination of the useless columns our data are described by 35 features
 # Transform the input data into an 2D-array
 X = windows.to_numpy()
@@ -259,8 +267,8 @@ X_test = scaler.transform(X_test)  # scale the test data as (value - mean_train)
 # Transform the labels using One-Hot-Encoding
 # e.g., Total number of label = 6 (from 0 to 5),
 # Selected label = 2 ---O-H-E----> Selected label = [0, 0, 1, 0, 0, 0]
-y_train_cat = to_categorical(y_train, num_classes=n_label)
-y_test_cat = to_categorical(y_test, num_classes=n_label)
+# y_train_cat = to_categorical(y_train, num_classes=n_label)
+# y_test_cat = to_categorical(y_test, num_classes=n_label)
 
 # Create the object of the best model according to Cross-Validation
 size = (Best_neurons,) * Best_layers  # Create the structure of the Artificial Neural Network
@@ -268,7 +276,7 @@ ann = MLPClassifier(hidden_layer_sizes=size, activation=Best_activation,
                     solver='adam', learning_rate='invscaling', max_iter=10000)
 Tick = time.time()  # Take the time before the training
 # Train the model
-ann.fit(X_train, y_train_cat)
+ann.fit(X_train, y_train)
 
 #  here I should return the weights of the ann 
 joblib.dump(ann, modelName)
@@ -287,7 +295,9 @@ y_probability = ann.predict_proba(X_test)
 
 # Open the file where will be saved all the test performances
 performances = open(performanceName, "w")
-acc = pd.DataFrame()  # create a structure to perform the measure manually
+acc = pd.DataFrame()
+y_test = np.argmax(y_test, axis=1)
+# create a structure to perform the measure manually
 acc['ground_truth'] = y_test  # add the ground truth
 acc['predicted'] = y_predicted  # add the predicted labels
 precision = [0] * n_label  # precision list
@@ -390,7 +400,7 @@ if n_label == 2:
 np.set_printoptions(precision=2)
 
 # Plot non-normalized confusion matrix
-plot_confusion_matrix(y_test, y_predicted, classes=labels,
+plot_confusion_matrix(y_test, y_predicted,
                       title='Confusion matrix, without normalization')
 
 # # Plot normalized confusion matrix

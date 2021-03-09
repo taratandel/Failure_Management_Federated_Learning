@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from sklearn import datasets
 from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
 from scipy.spatial.distance import cdist, pdist
+from keras.utils import to_categorical
 
 
 class DataDivider:
@@ -13,7 +14,7 @@ class DataDivider:
         if dataFrame != None:
             self.df = dataFrame
         else:
-            loadDataFrame(nameOfTheFile)
+            self.loadDataFrame(nameOfTheFile)
 
     def loadDataFrame(self, nameOfTheFile):
         self.df = pd.read_csv(nameOfTheFile)
@@ -35,4 +36,8 @@ class DataDivider:
     def oneHotEncode(self):
         y = self.df.pop('label')
         y = y.to_numpy()
-        y_train_cat = to_categorical(y_train, num_classes=n_label)
+        n_label = len(set(y))
+        y_cat = to_categorical(y, num_classes=n_label)
+        list_of_labels = ['{:.1f}'.format(x) for x in list(set(y))]
+        y_df = pd.DataFrame(y_cat, columns = list_of_labels)
+        self.df = pd.concat([self.df, y_df], axis=1)
