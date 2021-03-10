@@ -32,9 +32,9 @@ def plot_confusion_matrix(y_true, y_pred, classes = [],
             title = 'Confusion matrix, without normalization'
 
     # Compute confusion matrix
-    cm = confusion_matrix(y_true, y_pred)
+    cm = confusion_matrix(y_true, y_pred, [0,1,2,3,4,5])
     # Only use the labels that appear in the data
-    classes = list(set(y_test))
+    classes = [0,1,2,3,4,5]
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         print("Normalized confusion matrix")
@@ -76,7 +76,7 @@ i = 3
 fileName = "df" + str(i) + ".csv"
 resultName = "ANN_model_selection_results" + str(i) + ".txt"
 modelName = "Ann" + str(i) + ".sav"
-performanceName = "Performances_result_ANN" + str(i) + ".txt"
+performanceName = "Performances_result_ANN_Weighted_avg" + str(i) + ".txt"
 
 # --------------------------------------------------- OPEN THE FILES ---------------------------------------------------
 # CSV file from which we take the dataframe containing our data
@@ -276,11 +276,12 @@ ann = MLPClassifier(hidden_layer_sizes=size, activation=Best_activation,
                     solver='adam', learning_rate='invscaling', max_iter=10000)
 Tick = time.time()  # Take the time before the training
 # Train the model
-ann.fit(X_train, y_train)
+# ann.fit(X_train, y_train)
+#
+# #  here I should return the weights of the ann
+# joblib.dump(ann, modelName)
 
-#  here I should return the weights of the ann 
-joblib.dump(ann, modelName)
-
+ann = joblib.load('finalmodelWeightedAverage.sav')
 Tock = time.time() - Tick  # Calculate the training time
 # Predict the label on the test set
 # For each point the output is an array where the label is represented in O-H-E
