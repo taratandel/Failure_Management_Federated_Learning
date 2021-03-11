@@ -1,6 +1,6 @@
-Training Time(s): 1.3359642028808594 
-Accuracy automated: 0.07563025210084033 
-Accuracy manually: 0.07563025210084033 
-Precision per class automated: [0.03529412 0.         0.         0.         1.         0.        ] 
-Recall per class automated: [1. 0. 0. 0. 1. 0.] 
-F1-score automated: [0.06818182 0.         0.         0.         1.         0.        ] 
+Training Time(s): 0.01621079444885254 
+Accuracy automated: 0.9663865546218487 
+Accuracy manually: 0.9663865546218487 
+Precision per class automated: [0.5 0.  1.  0.  1.  1. ] 
+Recall per class automated: [1.         0.         0.5        0.         1.         0.98130841] 
+F1-score automated: [0.66666667 0.         0.66666667 0.         1.         0.99056604] 

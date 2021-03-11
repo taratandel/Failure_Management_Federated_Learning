@@ -76,7 +76,9 @@ i = 3
 fileName = "df" + str(i) + ".csv"
 resultName = "ANN_model_selection_results" + str(i) + ".txt"
 modelName = "Ann" + str(i) + ".sav"
-performanceName = "Performances_result_ANN_Weighted_avg" + str(i) + ".txt"
+performanceName = "Performances_result_ANN_Weighted_s_Average" + str(i) + ".txt"
+
+nameOfModel = 'finalmodelno_SampleAverage.sav'
 
 # --------------------------------------------------- OPEN THE FILES ---------------------------------------------------
 # CSV file from which we take the dataframe containing our data
@@ -281,7 +283,7 @@ Tick = time.time()  # Take the time before the training
 # #  here I should return the weights of the ann
 # joblib.dump(ann, modelName)
 
-ann = joblib.load('finalmodelWeightedAverage.sav')
+ann = joblib.load(nameOfModel)
 Tock = time.time() - Tick  # Calculate the training time
 # Predict the label on the test set
 # For each point the output is an array where the label is represented in O-H-E
