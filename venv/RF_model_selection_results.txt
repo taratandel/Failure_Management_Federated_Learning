@@ -1,0 +1,4 @@
+Layers : 1
+Neurons : 100
+Activation : logistic
+Cross-Validation accuracy : 0.8767682119205297 

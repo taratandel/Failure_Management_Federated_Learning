@@ -11,7 +11,7 @@ class DataDivider:
     df = pd.DataFrame()
 
     def __init__(self, nameOfTheFile=None, dataFrame=None):
-        if dataFrame != None:
+        if dataFrame is not None:
             self.df = dataFrame
         else:
             self.loadDataFrame(nameOfTheFile)
@@ -41,3 +41,5 @@ class DataDivider:
         list_of_labels = ['{:.1f}'.format(x) for x in list(set(y))]
         y_df = pd.DataFrame(y_cat, columns = list_of_labels)
         self.df = pd.concat([self.df, y_df], axis=1)
+
+    # def divideRandomly(self):
