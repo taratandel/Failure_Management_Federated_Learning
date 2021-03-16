@@ -10,14 +10,16 @@ import sklearn.metrics as mt
 from sklearn.metrics import roc_auc_score, roc_curve
 import time
 import joblib
+
 # Environmental settings
 pd.options.mode.chained_assignment = None
 np.set_printoptions(threshold=np.inf)
 
-from data_divider import *
+from DataDivider import *
+
 
 # ----------------------------------------------- CONFUSION MATRIX PLOT -----------------------------------------------
-def plot_confusion_matrix(y_true, y_pred, classes = [],
+def plot_confusion_matrix(y_true, y_pred, classes=[],
                           normalize=False,
                           title=None,
                           cmap=plt.cm.Blues):
@@ -32,9 +34,9 @@ def plot_confusion_matrix(y_true, y_pred, classes = [],
             title = 'Confusion matrix, without normalization'
 
     # Compute confusion matrix
-    cm = confusion_matrix(y_true, y_pred, [0,1,2,3,4,5])
+    cm = confusion_matrix(y_true, y_pred, [0, 1, 2, 3, 4, 5])
     # Only use the labels that appear in the data
-    classes = [0,1,2,3,4,5]
+    classes = [0, 1, 2, 3, 4, 5]
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         print("Normalized confusion matrix")
@@ -69,6 +71,7 @@ def plot_confusion_matrix(y_true, y_pred, classes = [],
                     color="white" if cm[w, j] > thresh else "black")
     fig.tight_layout()
     return ax
+
 
 # Code provided by: https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
 # ----------------------------------------------------------------------------------------------------------------------
@@ -120,7 +123,7 @@ windows = windows.fillna(-150)
 # Calculate the number of distinct labels
 n_label = 6
 # Have a list of all the distinct labels
-labels = [0.0,1.0,2.0,3.0,4.0,5.0]
+labels = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
 
 #            ------------------------------------------------------------------------------------------------
 

@@ -7,6 +7,10 @@ from scipy.spatial.distance import cdist, pdist
 from keras.utils import to_categorical
 
 
+def loadDataFrame(nameOfTheFile):
+    return pd.read_csv(nameOfTheFile)
+
+
 class DataDivider:
     df = pd.DataFrame()
 
@@ -14,10 +18,7 @@ class DataDivider:
         if dataFrame is not None:
             self.df = dataFrame
         else:
-            self.loadDataFrame(nameOfTheFile)
-
-    def loadDataFrame(self, nameOfTheFile):
-        self.df = pd.read_csv(nameOfTheFile)
+            self.df = loadDataFrame(nameOfTheFile)
 
     def divideByeqType(self):
         df = self.df

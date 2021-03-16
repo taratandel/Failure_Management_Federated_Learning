@@ -1,15 +1,22 @@
 from Coordinator import *
+from Clients import *
 
+# -------------------------------------------- FEDAVG Algorithm --------------------------------------------
+#                                               Qiang Yang, Yang Liu, et al.
+#                        Synthesis Lectures on Artificial Intelligence and Machine Learning.
+#                                             Morgan & Claypool Publishers, 2020
+# -----------------------------------------------------------------------------------------------------------
 coordinator = Coordinator()
-# client register
-t = 10
-for i in range(t)
-coordinator.initializeWeight()
-coordinator.pickTheClients()
-# for client in selected client
-#   start training
-#   return the trained weight
+initial_weights = coordinator.initializeWeight()
 
-coordinator.aggregateTheRecievedModels()
-coordinator.checkForConvergence()
-coordinator.broadCast()
+# client register
+rounds = 10
+for i in range(rounds):
+    clients = coordinator.pickTheClients()
+    for client in clients:
+        client
+    #   return the trained weight
+
+    coordinator.aggregateTheRecievedModels()
+    coordinator.checkForConvergence()
+    coordinator.broadcast()
