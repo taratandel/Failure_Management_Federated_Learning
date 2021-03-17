@@ -14,9 +14,8 @@ rounds = 10
 for i in range(rounds):
     clients = coordinator.pickTheClients()
     for client in clients:
-        client
-    #   return the trained weight
-
+        weight = client.participantUpdate()
+        coordinator.receiveWeight(weight)
     coordinator.aggregateTheRecievedModels()
     coordinator.checkForConvergence()
     coordinator.broadcast()
