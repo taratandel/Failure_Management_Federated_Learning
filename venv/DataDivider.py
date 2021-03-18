@@ -5,42 +5,55 @@ from sklearn import datasets
 from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
 from scipy.spatial.distance import cdist, pdist
 from keras.utils import to_categorical
+from sklearn.model_selection import train_test_split
 
 
 def loadDataFrame(nameOfTheFile):
     return pd.read_csv(nameOfTheFile)
 
 
-class DataDivider:
-    df = pd.DataFrame()
+def divideByeqType(df):
+    # create unique list of names
+    unique_eqtype = df.groupby('eqtype')
+    data_frames = [group for _, group in unique_eqtype]
+    i = 0
+    for data_frame in data_frames:
+        i = i + 1
+        name = 'df' + str(i) + '.csv'
+        data_frame.to_csv(name, index=False)
+        print("In entered", i)
 
-    def __init__(self, nameOfTheFile=None, dataFrame=None):
-        if dataFrame is not None:
-            self.df = dataFrame
-        else:
-            self.df = loadDataFrame(nameOfTheFile)
+    return data_frames
 
-    def divideByeqType(self):
-        df = self.df
-        # create unique list of names
-        unique_eqtype = df.groupby('eqtype')
-        dataFrames = [group for _, group in unique_eqtype]
-        i = 0
-        for dataframe in dataFrames:
-            i = i + 1
-            name = 'df' + str(i) + '.csv'
-            dataframe.to_csv(name, index=False)
-            print("In entered", i)
 
-        return dataFrames
+def calcFractions(data_frames):
+    frac = []
+    total = 0
+    for df in data_frames:
+        total = total + df.shape[0]
+    for df in data_frames:
+        frac.append(df.shape[0] / total)
+    return frac
 
-    def oneHotEncode(self):
-        y = self.df.pop('label')
-        y = y.to_numpy()
-        n_label = len(set(y))
-        y_cat = to_categorical(y, num_classes=n_label)
-        list_of_labels = ['{:.1f}'.format(x) for x in list(set(y))]
-        y_df = pd.DataFrame(y_cat, columns = list_of_labels)
-        self.df = pd.concat([self.df, y_df], axis=1)
 
-    # def divideRandomly(self):
+def divideRandomly(df,  fractions):
+    data_frames = []
+    for fraction in fractions:
+        data_frames.append(df.sample(frac=fraction))
+    return data_frames
+
+
+def oneHotEncode(df):
+    y = df.pop('label')
+    y = y.to_numpy()
+    n_label = len(set(y))
+    y_cat = to_categorical(y, num_classes=n_label)
+    list_of_labels = ['{:.1f}'.format(x) for x in list(set(y))]
+    y_df = pd.DataFrame(y_cat, columns=list_of_labels)
+    df = pd.concat([df, y_df], axis=1)
+    return df
+
+
+def divideTestSet(df: pd.DataFrame ,test_size = 0.2):
+    train, test = train_test_split(df, test_size=test_size)
+    return train, test

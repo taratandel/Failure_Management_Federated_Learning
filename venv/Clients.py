@@ -14,7 +14,7 @@ class Client:
         """
         initialize the client class
         :param data: pandas.DataFrame
-            to pass the dataframe directly
+            to pass the data_frame directly
         :param path: str
             to ask to load a csv file
         :exception
