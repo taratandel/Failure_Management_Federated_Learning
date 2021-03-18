@@ -1,14 +1,17 @@
-from DataDivider import loadDataFrame as lDF
+from dataDivider import loadDataFrame as lDF
+from ANN_Classifier import *
 import math
 import pandas as pd
 import numpy as np
+
 
 class Client:
     """
     This class is a representation of the participants that are willing to collaboratively
     train a machine learning model
     """
-    w1_1 =[]
+    w1_1 = []
+
     def __init__(self, data=None, path=None):
 
         """
@@ -43,15 +46,13 @@ class Client:
         """
         self.w1_1 = weights
         for i in range(epochs):
-            if M==math.inf:
+            if M == math.inf:
                 print("noon")
-    #             run the model with the whole data set
+                trainANN(df , epochs)
+            #             run the model with the whole data set
             else:
                 shuffled = self.dataFrame.sample(frac=1)
                 result = np.array_split(shuffled, 5)
-    #             run the model with these selected data
+                #             run the model with these selected data
                 return result
         return weights
-
-    def loadTheData(self, nameOfTheFile):
-

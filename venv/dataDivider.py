@@ -8,8 +8,15 @@ from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 
 
-def loadDataFrame(nameOfTheFile):
-    return pd.read_csv(nameOfTheFile)
+def loadDataFrame(path):
+    """
+    reads the csv file using a path
+    :param path: str
+        path of the csv file
+    :return:
+        a data frame
+    """
+    return pd.read_csv(path)
 
 
 def divideByeqType(df):

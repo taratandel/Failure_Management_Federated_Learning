@@ -75,218 +75,91 @@ def plot_confusion_matrix(y_true, y_pred, classes=[],
 
 # Code provided by: https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
 # ----------------------------------------------------------------------------------------------------------------------
-i = 3
-fileName = "df" + str(i) + ".csv"
-resultName = "ANN_model_selection_results" + str(i) + ".txt"
-modelName = "Ann" + str(i) + ".sav"
-performanceName = "Performances_result_ANN_Weighted_s_Average" + str(i) + ".txt"
-
-nameOfModel = 'finalmodelno_SampleAverage.sav'
-
-# --------------------------------------------------- OPEN THE FILES ---------------------------------------------------
-# CSV file from which we take the dataframe containing our data
-# windows = pd.read_csv("Labelled_Data.csv")
-dd = DataDivider(nameOfTheFile="Labelled_Data.csv")
-dd.oneHotEncode()
-dfs = dd.divideByeqType()
-windows = dfs[i - 1]
-# Txt file in which the model selection results will be saved
-result = open(resultName, "w")
+# i = 3
+# fileName = "df" + str(i) + ".csv"
+# resultName = "ANN_model_selection_results" + str(i) + ".txt"
+# modelName = "Ann" + str(i) + ".sav"
+# performanceName = "Performances_result_ANN_Weighted_s_Average" + str(i) + ".txt"
+#
+# nameOfModel = 'finalmodelno_SampleAverage.sav'
+#
+# # --------------------------------------------------- OPEN THE FILES ---------------------------------------------------
+# # CSV file from which we take the dataframe containing our data
+# # windows = pd.read_csv("Labelled_Data.csv")
+# dd = DataDivider(nameOfTheFile="Labelled_Data.csv")
+# dd.oneHotEncode()
+# dfs = dd.divideByeqType()
+# windows = dfs[i - 1]
+# # Txt file in which the model selection results will be saved
+# result = open(resultName, "w")
 # ----------------------------------------------------------------------------------------------------------------------
 
 # ------------------------------------------------ DATA PRE-PROCESSING ------------------------------------------------
+def trainANN(df, epochs):
+    windows = df
+    #            ---------------------------------------- NAN PROCESSING ----------------------------------------
+    # Identify the Transmitted power features
+    tx = ['txMaxAN-2', 'txminAN-2', 'txMaxBN-2', 'txminBN-2', 'txMaxAN-1', 'txminAN-1',
+          'txMaxBN-1', 'txminBN-1', 'txMaxAN', 'txminAN', 'txMaxBN', 'txminBN']
+    # Fill the Nan value in the Tx power features with 100
+    windows[tx] = windows[tx].fillna(100)
+    # Fill the Nan value in the Rx power features with -150
+    # We use two different values because in this problem the Tx power and the Rx power have two different range of values,
+    # when we will normalize the data (Some steps below) if the added values are too big this can eliminate the differences
+    # in the data values
+    #            ------------------------------------------------------------------------------------------------
 
-#            ---------------------------------------- NAN PROCESSING ----------------------------------------
-# Identify the Transmitted power features
-tx = ['txMaxAN-2', 'txminAN-2', 'txMaxBN-2', 'txminBN-2', 'txMaxAN-1', 'txminAN-1',
-      'txMaxBN-1', 'txminBN-1', 'txMaxAN', 'txminAN', 'txMaxBN', 'txminBN']
-# Fill the Nan value in the Tx power features with 100
-windows[tx] = windows[tx].fillna(100)
-# Fill the Nan value in the Rx power features with -150
-# We use two different values because in this problem the Tx power and the Rx power have two different range of values,
-# when we will normalize the data (Some steps below) if the added values are too big this can eliminate the differences
-# in the data values
-#            ------------------------------------------------------------------------------------------------
+    #           ---------------------------------------- LABELS PROCESSING ----------------------------------------
+    # Put the labels inside a variable
+    y = windows[windows.columns.values[-6:]].to_numpy()
+    windows = windows.fillna(-150)
 
-#           ---------------------------------------- LABELS PROCESSING ----------------------------------------
-# Put the labels inside a variable
-y = windows[windows.columns.values[-6:]].to_numpy()
-windows = windows.fillna(-150)
+    #         ----------------------------------------- CLEAN THE FEATURES -----------------------------------------
 
-# ----------------------------------------------------------------------------------------------------------------------
-# BINARY PROBLEM SETTINGS
-# index_zero = np.where(y != 5)  # Indexes of the well defined classes
-# index_one = np.where(y == 5)  # Indexes of the other problems
-# y[index_one] = 1  # Define the other problems as positive
-# y[index_zero] = 0  # Define the well defined as negative
-# ----------------------------------------------------------------------------------------------------------------------
-# Calculate the number of distinct labels
-n_label = 6
-# Have a list of all the distinct labels
-labels = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
+    # Collect the columns name of the input
+    columns = windows.columns.values
+    # Now variable columns is a list containing all the names of the features
+    # The variable is used to address and drop some features not useful in the training and cross-validation phase
+    # Delete the columns that are not useful
+    windows = windows.drop(columns=columns[:8])
+    windows = windows.drop(columns=columns[-6:])
+    # Delete the 'label' columns because we can't train a model using it as an input data
+    # windows = windows.drop(columns=['label'])
+    # After the elimination of the useless columns our data are described by 35 features
+    # Transform the input data into an 2D-array
+    X = windows.to_numpy()
 
-#            ------------------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------------------
+    # provide to the object the data that will split
+    skf.get_n_splits(X, y)
+    # Instantiate the scaler element
+    scaler = StandardScaler()
 
-#           ----------------------------------------- NEW FEATURES -----------------------------------------
+    # Hyperparameters to set according to the model selection result
+    # if the hyperparameters are given the model selection part must be commented as reported in the previous comments
+    Best_layers = 3
+    Best_neurons = 100
+    Best_activation = "tanh"
 
-# Create new features to improve the model results
+    # Scale the data
+    X_train = scaler.fit_transform(X_train)  # Scale the train data as (value - mean) / std
+    # X_test = scaler.transform(X_test)  # scale the test data as (value - mean_train) / std_train
 
-# # Example
-# windows['DeltamaxAN'] = windows['RxNominal'] - windows['rxmaxAN']
+    # Create the object of the best model according to Cross-Validation
+    size = (Best_neurons,) * Best_layers  # Create the structure of the Artificial Neural Network
+    ann = MLPClassifier(hidden_layer_sizes=size, activation=Best_activation,
+                        solver='adam', learning_rate='invscaling', max_iter=epochs)
+    ann.fit(X_train, y)
+
+    return ann
 
 
-#            ------------------------------------------------------------------------------------------------
-
-#         ----------------------------------------- CLEAN THE FEATURES -----------------------------------------
-
-# Collect the columns name of the input
-columns = windows.columns.values
-# Now variable columns is a list containing all the names of the features
-# The variable is used to address and drop some features not useful in the training and cross-validation phase
-# Delete the columns that are not useful
-windows = windows.drop(columns=columns[:8])
-windows = windows.drop(columns=columns[-6:])
-# Delete the 'label' columns because we can't train a model using it as an input data
-# windows = windows.drop(columns=['label'])
-# After the elimination of the useless columns our data are described by 35 features
-# Transform the input data into an 2D-array
-X = windows.to_numpy()
-
-#            ------------------------------------------------------------------------------------------------
-
-#         ----------------------------------------- DATAFRAME SPLITTING -----------------------------------------
-test_percentage = 0.2  # Percentage of points contained in the test dataset (e.g., 20% = 0.2)
-
-# Perform a Train-Test split maintaining the distribution of the classes inside the splits
-# Parameters explanation:
-# X = input data described by 35 dimensions
-# y = labels assigned to the input data
-# test_size = percentage of the test set
-# random_state = seed of the random function, a fixed value provide to have the same splitting in different
-#                execution of the script
-# stratify = takes as input the list of the labels, providing the list of the labels the function provide as output
-#            train and test sets where the proportion of the classes is maintained
-# shuffle = if it is true, shuffle each class’s samples before splitting into batches
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_percentage,
-                                                    random_state=42, stratify=y, shuffle=True)
-
-# Select the number of splitting to perform Cross-Validation
-n_split_kfold = 10
-
-# Create the object that will split the data maintaining the proportion of the classes
-# Parameters explanation:
-# n_splits = number of fold in which our training dataset is divided
-# random_state = seed of the random function, a fixed value provide to have the same splitting in different
-#                execution of the script
-# shuffle = if it is true, shuffle each class’s samples before splitting into batches
-skf = StratifiedKFold(n_splits=n_split_kfold, shuffle=True, random_state=42)
-
-# provide to the object the data that will split
-skf.get_n_splits(X_train, y_train)
-# Instantiate the scaler element
-scaler = StandardScaler()
-# ----------------------------------------------------------------------------------------------------------------------
-# ---------------------------- START COMMENT HERE IF YOU ALREADY HAVE THE HYPER-PARAMETERS ----------------------------
-# ------------------------------------------------MODEL SELECTION PHASE------------------------------------------------
-
-comb = 0  # Iteration variable
-Best_score = 0  # Best cross validation score of a certain model
-Best_layers = 0  # Best number of layers
-Best_neurons = 0  # Best number of neurons
-Best_activation = ""  # Best activation function
-# for activation in ['identity', 'logistic', 'tanh', 'relu']:  # Loop over activation functions
-#     for neurons in [10, 50, 100]:  # Loop over the number of neurons per layer
-#         for layers in range(1, 4):  # Loop over the number of hidden layers
-#             comb += 1
-#             print("Progress ----> ", comb, "/36")
-#             score = 0
-#             for train_index, test_index in skf.split(X_train, y_train):  # Loop over the cross validation folds
-#
-#                 # Pick the input data for the training and validation sets
-#                 X_train_val, X_val = X_train[train_index], X_train[test_index]
-#                 # Pick the labels for the training and validation sets
-#                 y_train_val, y_val = y_train[train_index], y_train[test_index]
-#
-#                 # ------------------------------------- Scale the data (Automated) -------------------------------------
-#                 X_train_val = scaler.fit_transform(X_train_val)  # Scale the train data as (value - mean) / std
-#                 X_val = scaler.transform(X_val)  # scale the validation data as (value - mean_train) / std_train
-#                 # ------------------------------------------------------------------------------------------------------
-#
-#                 # ------------------------------------- Scale the data (Manually) -------------------------------------
-#                 # mean_train = np.mean(X_train_val, axis=0)  # Mean per feature of the training data
-#                 # std_train = np.std(X_train_val, axis=0)  # Std per feature of the training data
-#                 # X_train_val = (X_train_val-mean_train) / std_train  # Scaling training data
-#                 # X_val = (X_val-mean_train) / std_train  # Scaling validation data
-#                 # ------------------------------------------------------------------------------------------------------
-#
-#                 # Transform the labels using One-Hot-Encoding (O-H-E)
-#                 # e.g., Total number of label = 6 (from 0 to 5),
-#                 # Selected label = 2 ---O-H-E----> Selected label = [0, 0, 1, 0, 0, 0]
-#                 y_train_cat = to_categorical(y_train_val, num_classes=n_label)
-#                 y_val_cat = to_categorical(y_val, num_classes=n_label)
-#
-#                 # Create the object of the model that must be tested
-#                 size = (neurons,) * layers  # Create the structure of the Artificial Neural Network
-#                 ann = MLPClassifier(hidden_layer_sizes=size, activation=activation,
-#                                     solver='adam', learning_rate='invscaling', max_iter=10000)
-#                 # Train the model
-#                 ann.fit(X_train_val, y_train_cat)
-#                 # Compute the validation score
-#                 score += ann.score(X_val, y_val_cat)
-#             # Compute the cross validation score
-#             score = score / n_split_kfold
-#             # Check if the cross-validation score is higher wrt the previous best score
-#             if Best_score < score:
-#                 Best_score = score  # Put the new best score in the variable
-#                 Best_layers = layers  # New best number of layers
-#                 Best_neurons = neurons  # New best number of neurons
-#                 Best_activation = activation  # New best activation function
-#
-# # Write the model selection results in the file
-# result.write("Layers : %s\n" % Best_layers)
-# result.write("Neurons : %s\n" % Best_neurons)
-# result.write("Activation : %s\n" % Best_activation)
-# result.write("Cross-Validation accuracy : %s \n" % Best_score)
-#
-# result.close()
-# ----------------------------------------------------------------------------------------------------------------------
-# ----------------------------- END COMMENT HERE IF YOU ALREADY HAVE THE HYPER-PARAMETERS -----------------------------
-# ----------------------------------------------------TESTING PHASE----------------------------------------------------
-
-# Hyperparameters to set according to the model selection result
-# if the hyperparameters are given the model selection part must be commented as reported in the previous comments
-Best_layers = 3
-Best_neurons = 100
-Best_activation = "tanh"
-
-# Scale the data (Manually)
-# mean_train = np.mean(X_train, axis=0)  # Mean per feature of the training data
-# std_train = np.std(X_train, axis=0)  # Std per feature of the training data
-# X_train = (X_train-mean_train) / std_train  # Scaling training data
-# X_test = (X_test-mean_train) / std_train  # Scaling validation data
-
-# Scale the data
-X_train = scaler.fit_transform(X_train)  # Scale the train data as (value - mean) / std
-X_test = scaler.transform(X_test)  # scale the test data as (value - mean_train) / std_train
-
-# Transform the labels using One-Hot-Encoding
-# e.g., Total number of label = 6 (from 0 to 5),
-# Selected label = 2 ---O-H-E----> Selected label = [0, 0, 1, 0, 0, 0]
-# y_train_cat = to_categorical(y_train, num_classes=n_label)
-# y_test_cat = to_categorical(y_test, num_classes=n_label)
-
-# Create the object of the best model according to Cross-Validation
-size = (Best_neurons,) * Best_layers  # Create the structure of the Artificial Neural Network
-ann = MLPClassifier(hidden_layer_sizes=size, activation=Best_activation,
-                    solver='adam', learning_rate='invscaling', max_iter=10000)
 Tick = time.time()  # Take the time before the training
 # Train the model
-# ann.fit(X_train, y_train)
 #
 # #  here I should return the weights of the ann
 # joblib.dump(ann, modelName)
 
-ann = joblib.load(nameOfModel)
 Tock = time.time() - Tick  # Calculate the training time
 # Predict the label on the test set
 # For each point the output is an array where the label is represented in O-H-E

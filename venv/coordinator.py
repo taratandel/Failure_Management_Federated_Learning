@@ -1,4 +1,4 @@
-from Clients import *
+from clients import *
 import math
 
 
@@ -27,13 +27,12 @@ class Coordinator:
      A typical assumption is that the participants are honest whereas the server is honest-but-curious"""
 
     received_weight = []
+    clients = []
 
-    def __init__(self, clients, epochs, rho=1, S=1, M=math.inf):
+    def __init__(self, epochs, rho=1, S=1, M=math.inf):
         """
         We may set M = inf and S = 1 to produce a form of SGD with a varying mini-batch size.
 
-        :param clients: [Client]
-            the total clients that registered
         :param epochs: int
             the number of local of epoch for each client
         :param rho: float
@@ -48,13 +47,12 @@ class Coordinator:
             We use M = inf to indicate that the full local dataset is treated as a single mini-batch.
         """
 
-        self.clients = clients
         self.epochs = epochs
         self.rho = rho
         self.S = S
         self.M = M
 
-    def pickTheClients(self, rho=self.rho):
+    def pickTheClients(self, rho=1):
         """
         The coordinator determines Ct , which is the set of randomly selected max(rho; 1) participants.
 
@@ -64,7 +62,7 @@ class Coordinator:
             an array of selected participants
         """
 
-        if rho == 1 | rho < 1:
+        if (rho == 1) | (rho < 1):
             chosen_clients = self.clients
         else:
 
@@ -72,6 +70,14 @@ class Coordinator:
                 chosen_clients = random.choice(self.clients)
 
         return chosen_clients
+
+    def registerClient(self, client):
+        """
+        This function registers clients to participate in the learning process
+        :param client: Client
+            The client that wants to be registered
+        """
+        self.clients.append(client)
 
     def receiveWeight(self, weight):
         self.received_weight.append(weight)
