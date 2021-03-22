@@ -1,5 +1,6 @@
 from clients import *
 import math
+from modelAverage import weightedAverageModel
 
 
 def initializeWeight(initial_value=0, length=35):
@@ -26,7 +27,9 @@ class Coordinator:
      (also known as parameter server or aggregation server).
      A typical assumption is that the participants are honest whereas the server is honest-but-curious"""
 
-    received_weight = []
+    received_intercept = []
+    received_coefs = []
+    received_models = []
     clients = []
 
     def __init__(self, epochs, rho=1, S=1, M=math.inf):
@@ -79,16 +82,46 @@ class Coordinator:
         """
         self.clients.append(client)
 
-    def receiveWeight(self, weight):
-        self.received_weight.append(weight)
+    def receiveModels(self, model):
+        """
+        receive the weights from the clients and keep them all together
+        :param model: []
+            and array of intercepts and coefficients from the current the client
+        """
+        self.received_models = model
+        self.received_intercept = model.intercepts_
+        self.received_coefs = model.coefs_
 
-    def aggregateTheRecievedModels(self):
-        agg_weights = weights
+    def aggregateTheReceivedModels(self, criteria='w'):
+        """
+        aggregate the weights and intercepts of all the clients based in the specified criteria
+
+        :param: criteria: string default='w'
+            can be 'w', 'smw', 'normal'
+            'w': weighted average by the number of samples of each client
+            'smw': weighted average by the number of samples that's been seen during the training phase of the client
+            'normal': normal averaging
+        :return:
+            and aggregated array of all the intercept and weights that are averaged
+        """
+        if criteria == 'w':
+            agg_weights = weightedAverageModel(self.received_intercept, self.received_coefs, self.__getClientsSamples())
 
         return agg_weights
 
-    def checkForConvergence(self):
+    def __getClientsSamples(self):
+        """
+        a private function for calculating the number of samples in each client
+        :return:
+            returns a list with number of samples of each client
+        """
+        clients_samples = []
+        for client in self.clients:
+            clients_samples.append(client.getNumberOfSamples())
 
+        return clients_samples
+
+    def checkForConvergence(self):
         return true
 
     def broadcast(self):

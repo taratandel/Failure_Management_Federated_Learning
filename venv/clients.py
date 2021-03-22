@@ -10,7 +10,8 @@ class Client:
     This class is a representation of the participants that are willing to collaboratively
     train a machine learning model
     """
-    w1_1 = []
+    dataFrame: pd.DataFrame
+    weights = []
 
     def __init__(self, data=None, path=None):
 
@@ -31,11 +32,13 @@ class Client:
         else:
             raise Exception("Sorry, provide a data or a path. both cannot be empty")
 
-    def participantUpdate(self, weights, epochs, M):
+    def participantUpdate(self, coefs, intercepts, epochs, M):
         """
         Update it's weight according to the parameters and the weights gained by the server
 
-        :param weights: []
+        :param intercepts: []
+            ther intercepts that are coming form the server
+        :param coefs: []
             weights coming from the server
         :param epochs: int
             the number of local epochs that each client should do
@@ -44,15 +47,12 @@ class Client:
         :return:
             the locally updated weights
         """
-        self.w1_1 = weights
-        for i in range(epochs):
-            if M == math.inf:
-                print("noon")
-                trainANN(df , epochs)
-            #             run the model with the whole data set
-            else:
-                shuffled = self.dataFrame.sample(frac=1)
-                result = np.array_split(shuffled, 5)
-                #             run the model with these selected data
-                return result
-        return weights
+        return trainANN(self.dataFrame, epochs, M, coefs, intercepts)
+
+    def getNumberOfSamples(self):
+        """
+        the getter of the client
+        :return:
+            it returns the number of samples of the client
+        """
+        return len(self.dataFrame.index)

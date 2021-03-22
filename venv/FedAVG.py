@@ -29,8 +29,8 @@ clients_test = divideRandomly(test, calcFractions(clients_train))
 # creates the client with the given data
 clients = []
 for client_train in clients_train:
-    clients.append(Client(data=client_train))
-
+    client = Client(data=client_train)
+    clients.append(client)
 
 # registers the clients as a participant in the coordinator
 coordinator.registerClient(clients)
@@ -38,7 +38,7 @@ coordinator.registerClient(clients)
 # the number of total rounds before the learning stops
 # there are other criteria to stop the training for start we say rounds.
 rounds = 10
-
+average_weights = None
 for i in range(rounds):
     # coordinator pick the client this can be even a fraction of them that is parametrized by
     # rho if rho = 1 then coordinator selects all the clients. default is rho=1
@@ -46,8 +46,12 @@ for i in range(rounds):
     clients = coordinator.pickTheClients()
     # after the clients had been chosen now all of should start learning
     for client in clients:
-        weight = client.participantUpdate()
-        coordinator.receiveWeight(weight)
-    coordinator.aggregateTheRecievedModels()
-    coordinator.checkForConvergence()
-    coordinator.broadcast()
+        if average_weights is None:
+            # train the client with the specified parameters set by the server
+            model = client.participantUpdate(coefs=None, intercepts=None, epochs=coordinator.epochs, M=coordinator.M)
+        else:
+            model = client.participantUpdate(coefs=average_weights[1], intercepts=average_weights[0],
+                                             epochs=coordinator.epochs, M=coordinator.M)
+        coordinator.receiveModels(model)
+
+    average_weights = coordinator.aggregateTheReceivedModels()

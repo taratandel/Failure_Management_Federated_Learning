@@ -2,39 +2,29 @@ from joblib import load, dump
 from copy import deepcopy as dc
 
 
-def weightedAverageModel(weights, models):
-    models_params = weights
-    total = 593 + 1877 + 43
-    intercept = []
-    weight = []
-    for i in range(len(models_params)):
-        param = models_params[i]
+def weightedAverageModel(received_intercept, received_coef, no_samples):
+    total = sum(no_samples)
+    for i in range(len(no_samples)):
+        ns = no_samples[i]
+        intc = received_intercept[i]
+        coef = received_coef[i]
         if i == 0:
-            intercept = param.intercepts_
-            intercept[:] = [x * 1877 for x in intercept]
+            intercept = intc
+            intercept[:] = [x * ns for x in intercept]
 
-            weight = param.coefs_
-            weight[:] = [x * 1877 for x in weight]
+            weight = coef
+            weight[:] = [x * ns for x in weight]
 
-        elif i == 1:
-            model2_interc = [x * 43 for x in param.intercepts_]
-            model2_coef = [x * 43 for x in param.coefs_]
-            intercept = [sum(x) for x in zip(model2_interc, intercept)]
-            weight = [sum(x) for x in zip(model2_coef, weight)]
         else:
-            model2_interc = [x * 593 for x in param.intercepts_]
-            model2_coef = [x * 593 for x in param.coefs_]
+            model2_interc = [x * ns for x in intc]
+            model2_coef = [x * ns for x in coef]
             intercept = [sum(x) for x in zip(model2_interc, intercept)]
             weight = [sum(x) for x in zip(model2_coef, weight)]
 
     intercept[:] = [x / total for x in intercept]
     weight[:] = [x / total for x in weight]
 
-    final_model = dc(models_params[2])
-    final_model.coefs_ = weight
-    final_model.intercepts_ = intercept
-    dump(final_model, 'finalmodelWeightedAverage.sav')
-    print(final_model.coefs_, final_model.intercepts_)
+    return intercept, weight
 
 
 def iterAverageModel():
