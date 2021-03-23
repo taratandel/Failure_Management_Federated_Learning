@@ -1,7 +1,7 @@
 from dataDivider import loadDataFrame as lDF
+from dataDivider import cleanData as cD
 from ANN_Classifier import *
 import math
-import pandas as pd
 import numpy as np
 
 
@@ -47,7 +47,8 @@ class Client:
         :return:
             the locally updated weights
         """
-        return trainANN(self.dataFrame, epochs, M, coefs, intercepts)
+        X,y = cD(self.dataFrame)
+        return trainANN(X, y, epochs, M, coefs, intercepts)
 
     def getNumberOfSamples(self):
         """

@@ -1,7 +1,8 @@
 from coordinator import *
 from clients import *
 from dataDivider import *
-
+from ANN_Classifier import *
+from modelTester import *
 # -------------------------------------------- FEDAVG Algorithm --------------------------------------------
 #                                               Qiang Yang, Yang Liu, et al.
 #                        Synthesis Lectures on Artificial Intelligence and Machine Learning.
@@ -55,3 +56,12 @@ for i in range(rounds):
         coordinator.receiveModels(model)
 
     average_weights = coordinator.aggregateTheReceivedModels()
+
+final_model = coordinator.broadcast(average_weights)
+# ------------------------------------------------ Model Comparison -------------------------------------
+# here we try to compare the performance of the model in two cases: trained alone or in collaborative mode
+# -------------------------------------------------------------------------------------------------------
+
+for test in clients_test:
+    X_test, y_test = cleanData(test)
+    tester = ModelTester(X_test, y_test, final_model)

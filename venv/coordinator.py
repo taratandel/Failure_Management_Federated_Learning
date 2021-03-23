@@ -30,6 +30,7 @@ class Coordinator:
     received_intercept = []
     received_coefs = []
     received_models = []
+    agg_weights = []
     clients = []
 
     def __init__(self, epochs, rho=1, S=1, M=math.inf):
@@ -107,7 +108,6 @@ class Coordinator:
         """
         if criteria == 'w':
             agg_weights = weightedAverageModel(self.received_intercept, self.received_coefs, self.__getClientsSamples())
-
         return agg_weights
 
     def __getClientsSamples(self):
@@ -125,6 +125,8 @@ class Coordinator:
     def checkForConvergence(self):
         return true
 
-    def broadcast(self):
-
-        return weights
+    def broadcast(self, avg_weights):
+        model = self.received_models[0]
+        model.coefs_ = avg_weights[1]
+        model.intercepts_ = avg_weights[0]
+        return model
