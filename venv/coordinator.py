@@ -55,7 +55,7 @@ class Coordinator:
         self.S = S
         self.M = M
 
-    def pickTheClients(self, rho=1):
+    def pickClients(self, rho=1):
         """
         The coordinator determines Ct , which is the set of randomly selected max(rho; 1) participants.
 
@@ -80,7 +80,8 @@ class Coordinator:
         :param client: Client
             The client that wants to be registered
         """
-        self.clients.append(client)
+        for cl in client:
+            self.clients.append(cl)
 
     def receiveModels(self, model):
         """
@@ -88,9 +89,9 @@ class Coordinator:
         :param model: []
             and array of intercepts and coefficients from the current the client
         """
-        self.received_models = model
-        self.received_intercept = model.intercepts_
-        self.received_coefs = model.coefs_
+        self.received_models.append(model)
+        self.received_intercept.append(model.intercepts_)
+        self.received_coefs.append(model.coefs_)
 
     def aggregateTheReceivedModels(self, criteria='w'):
         """

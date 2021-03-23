@@ -9,11 +9,13 @@ import math
 class MLPClassifierOverride(MLPClassifier):
     coef = []
     intercep = []
+    layer_no = 0
 
     # Overriding _init_coef method
     def _init_coef(self, fan_in, fan_out, dtype):
         # Use the initialization method recommended by
         # Glorot et al.
+        layer_no = self.layer_no
         factor = 6.
         if self.activation == 'logistic':
             factor = 2.
@@ -25,11 +27,12 @@ class MLPClassifierOverride(MLPClassifier):
         intercept_init = self._random_state.uniform(-init_bound, init_bound,
                                                     fan_out)
         if self.coef is not None:
-            coef_init = self.coef
-            intercept_init = self.intercep
+            coef_init = self.coef[layer_no]
+            intercept_init = self.intercep[layer_no]
         else:
             coef_init = coef_init.astype(dtype, copy=False)
             intercept_init = intercept_init.astype(dtype, copy=False)
+        self.layer_no = self.layer_no + 1
         return coef_init, intercept_init
 
 
@@ -89,7 +92,7 @@ def trainANN(df, epochs, M, coef, intercept):
     ann = MLPClassifierOverride(hidden_layer_sizes=size, activation=best_activation,
                                 solver='adam', learning_rate='invscaling', max_iter=epochs, batch_size=M)
     ann.coef = coef
-    ann.intercept = intercept
+    ann.intercep = intercept
     ann.fit(X_train, y)
 
     return ann

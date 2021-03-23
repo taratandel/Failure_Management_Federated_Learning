@@ -43,9 +43,9 @@ for i in range(rounds):
     # coordinator pick the client this can be even a fraction of them that is parametrized by
     # rho if rho = 1 then coordinator selects all the clients. default is rho=1
     # example: coordinator.pickTheClient(rho=0.2)
-    clients = coordinator.pickTheClients()
+    chosen_clients = coordinator.pickClients()
     # after the clients had been chosen now all of should start learning
-    for client in clients:
+    for client in chosen_clients:
         if average_weights is None:
             # train the client with the specified parameters set by the server
             model = client.participantUpdate(coefs=None, intercepts=None, epochs=coordinator.epochs, M=coordinator.M)
