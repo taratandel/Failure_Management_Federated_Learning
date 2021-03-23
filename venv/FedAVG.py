@@ -3,6 +3,7 @@ from clients import *
 from dataDivider import *
 from ANN_Classifier import *
 from modelTester import *
+import math
 # -------------------------------------------- FEDAVG Algorithm --------------------------------------------
 #                                               Qiang Yang, Yang Liu, et al.
 #                        Synthesis Lectures on Artificial Intelligence and Machine Learning.
@@ -57,11 +58,24 @@ for i in range(rounds):
 
     average_weights = coordinator.aggregateTheReceivedModels()
 
-final_model = coordinator.broadcast(average_weights)
 # ------------------------------------------------ Model Comparison -------------------------------------
 # here we try to compare the performance of the model in two cases: trained alone or in collaborative mode
 # -------------------------------------------------------------------------------------------------------
 
-for test in clients_test:
+for i in range(len(clients)):
+    # train a model for each client without collaborating with other clients
+    client = clients[i]
+    client_model = client.participantUpdate(None, None, M=math.inf, epochs=2000)
+    # prepare a test set to be used for the testing phase for both models
+    test = clients_test[i]
     X_test, y_test = cleanData(test)
-    tester = ModelTester(X_test, y_test, final_model)
+    # create the tester for the client trained alone
+    tester_alone = ModelTester(X_test, y_test, client_model)
+    # create the tester for the same client but this time it trained collaboratively
+    final_model = coordinator.broadcast(average_weights, i)
+    tester_collaborative = ModelTester(X_test, y_test, final_model)
+
+    tester_alone.calcStatistic("test_alone client number:" + str(i))
+    tester_collaborative.calcStatistic("test_collaborative client number:" + str(i))
+
+

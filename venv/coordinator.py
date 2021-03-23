@@ -125,8 +125,8 @@ class Coordinator:
     def checkForConvergence(self):
         return true
 
-    def broadcast(self, avg_weights):
-        model = self.received_models[0]
+    def broadcast(self, avg_weights, i):
+        model = self.received_models[i]
         model.coefs_ = avg_weights[1]
         model.intercepts_ = avg_weights[0]
         return model

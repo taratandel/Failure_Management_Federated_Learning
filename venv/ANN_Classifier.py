@@ -1,5 +1,6 @@
 from sklearn.neural_network import MLPClassifier
 import math
+import numpy as np
 
 
 class MLPClassifierOverride(MLPClassifier):

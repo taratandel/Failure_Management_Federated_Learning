@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
-
+from sklearn.preprocessing import StandardScaler
 
 def cleanData(df):
     windows = df
