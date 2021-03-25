@@ -33,7 +33,7 @@ class MLPClassifierOverride(MLPClassifier):
         return coef_init, intercept_init
 
 
-def trainANN(X_train, y, epochs, M, coef, intercept):
+def trainANN(X_train, y, epochs, M, coef, intercept, learning_rate):
     best_layers = 3
     best_neurons = 100
     best_activation = "tanh"
@@ -43,7 +43,7 @@ def trainANN(X_train, y, epochs, M, coef, intercept):
     if M == math.inf:
         M = 'auto'
     ann = MLPClassifierOverride(hidden_layer_sizes=size, activation=best_activation,
-                                solver='adam', learning_rate='invscaling', max_iter=epochs, batch_size=M)
+                                solver='adam', learning_rate='invscaling', max_iter=epochs, batch_size=M, alpha=learning_rate)
     ann.coef = coef
     ann.intercep = intercept
     ann.fit(X_train, y)

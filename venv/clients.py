@@ -32,13 +32,19 @@ class Client:
             self.dataFrame = lDF(path)
         else:
             raise Exception("Sorry, provide a data or a path. both cannot be empty")
+        self._cleanData()
 
-    def participantUpdate(self, coefs, intercepts, epochs, M):
+    def _cleanData(self):
+        self.X, self.y = cD(self.dataFrame)
+
+    def participantUpdate(self, coefs, intercepts, epochs, M, learning_rate):
         """
         Update it's weight according to the parameters and the weights gained by the server
 
+        :param learning_rate: float
+            the learning rate of the learner
         :param intercepts: []
-            ther intercepts that are coming form the server
+            the intercepts that are coming form the server
         :param coefs: []
             weights coming from the server
         :param epochs: int
@@ -48,8 +54,7 @@ class Client:
         :return:
             the locally updated weights
         """
-        X,y = cD(self.dataFrame)
-        return trainANN(X, y, epochs, M, coefs, intercepts)
+        return trainANN(self.X, self.y, epochs, M, coefs, intercepts, learning_rate)
 
     def getNumberOfSamples(self):
         """
