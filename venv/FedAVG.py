@@ -39,9 +39,10 @@ coordinator.registerClient(clients)
 
 # the number of total rounds before the learning stops
 # there are other criteria to stop the training for start we say rounds.
-rounds = 10
+rounds = 20000
 average_weights = None
 for i in range(rounds):
+    print("round:" + str(i))
     # coordinator pick the client this can be even a fraction of them that is parametrized by
     # rho if rho = 1 then coordinator selects all the clients. default is rho=1
     # example: coordinator.pickTheClient(rho=0.2)
@@ -55,8 +56,13 @@ for i in range(rounds):
             model = client.participantUpdate(coefs=average_weights[1], intercepts=average_weights[0],
                                              epochs=coordinator.epochs, M=coordinator.M)
         coordinator.receiveModels(model)
-
-    average_weights = coordinator.aggregateTheReceivedModels()
+        model = None
+        client = None
+    if i == rounds-1:
+        average_weights = coordinator.aggregateTheReceivedModels(should_empty=False)
+    else:
+        average_weights = coordinator.aggregateTheReceivedModels()
+    chosen_clients = None
 
 # ------------------------------------------------ Model Comparison -------------------------------------
 # here we try to compare the performance of the model in two cases: trained alone or in collaborative mode

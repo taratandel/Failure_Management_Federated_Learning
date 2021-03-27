@@ -27,11 +27,15 @@ class Client:
         """
 
         if data is not None:
-            self.dataFrame = data
+            dataFrame = data
         elif path is not None:
-            self.dataFrame = lDF(path)
+            dataFrame = lDF(path)
         else:
             raise Exception("Sorry, provide a data or a path. both cannot be empty")
+        self.__cleanData(dataFrame)
+
+    def __cleanData(self, dataFrame):
+        self.X, self.y = cD(dataFrame)
 
     def participantUpdate(self, coefs, intercepts, epochs, M):
         """
@@ -48,8 +52,7 @@ class Client:
         :return:
             the locally updated weights
         """
-        X,y = cD(self.dataFrame)
-        return trainANN(X, y, epochs, M, coefs, intercepts)
+        return trainANN(self.X, self.y, epochs, M, coefs, intercepts)
 
     def getNumberOfSamples(self):
         """
@@ -57,4 +60,4 @@ class Client:
         :return:
             it returns the number of samples of the client
         """
-        return len(self.dataFrame.index)
+        return len(self.X)
