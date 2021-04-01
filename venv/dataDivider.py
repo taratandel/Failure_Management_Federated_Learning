@@ -4,8 +4,18 @@ from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-def cleanData(df):
-    windows = df
+# ------------------------------------- Experiments --------------------------------------------
+# divides randomly the test set for the clients the reason I did that was to have all
+# the labels in all the clients. this division is fractionated by number number of samples that
+# each client has.
+# clients_test = divideRandomly(test, calcFractions(clients_train))
+# initialize the weight still need work but for now don't use it
+# initial_weights = coordinator.initializeWeight()
+# -----------------------------------------------------------------------------------------------
+
+
+def cleanData(windows):
+    windows = windows
     #            ---------------------------------------- NAN PROCESSING ----------------------------------------
     # Identify the Transmitted power features
     tx = ['txMaxAN-2', 'txminAN-2', 'txMaxBN-2', 'txminBN-2', 'txMaxAN-1', 'txminAN-1',
@@ -103,3 +113,16 @@ def oneHotEncode(df):
 def divideTestSet(df: pd.DataFrame, test_size=0.2):
     train, test = train_test_split(df, test_size=test_size)
     return train, test
+
+def prepareDataSet():
+    # Load the dataframe
+    df = loadDataFrame("Labelled_Data.csv")
+    # # On-Hot-Encode the labels
+    df = oneHotEncode(df)
+    # split test set with 20% (default is 20% if you want to change the percentage
+    # just call the function with desire percentage example: divideTestSet(df, test_size = 0.1)
+    train, test = divideTestSet(df)
+    # here I divided by the equipment type the rest of the code will work regardless of your division
+    # for your ease of use just instead of clients_train give any split you want
+    clients_train = divideByeqType(train)
+    test.to_csv("test.csv", index=False)

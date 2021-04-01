@@ -2,6 +2,7 @@ from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import numpy as np
 import sklearn.metrics as mt
+import matplotlib.pyplot as plt
 
 
 def plot_confusion_matrix(y_true, y_pred, classes=[],
@@ -59,7 +60,13 @@ def plot_confusion_matrix(y_true, y_pred, classes=[],
 
 
 # Code provided by: https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
-
+def plotSimpleFigure(values, xlabel, ylabel, title):
+    plt.plot(range(1, len(values)+1), values, label='accuracy')  # Plot some data on the (implicit) axes.
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.legend()
+    plt.show()
 
 class ModelTester:
     """
@@ -67,6 +74,10 @@ class ModelTester:
     """
 
     def __init__(self, X, y, model):
+        self.f1 = []
+        self.recall = []
+        self.acc = []
+        self.prec = []
         self.X = X
         self.y = y
         self.model = model
@@ -81,17 +92,27 @@ class ModelTester:
 
     def calcStatistic(self, performance_name):
         # Open the file where will be saved all the test performances
-        performances = open(performance_name, "w")
         y_test = np.argmax(self.y, axis=1)
         # create a structure to perform the measure manually
         labels = list(set(y_test))
-        performances.write("Accuracy automated: %s \n" % mt.accuracy_score(y_test, self.y_predicted))
+        self.acc = mt.accuracy_score(y_test, self.y_predicted)
+
+        self.prec = mt.precision_score(y_test, self.y_predicted, labels=labels, average=None)
+
+        self.recall = mt.recall_score(y_test, self.y_predicted, labels=labels, average=None)
+
+        self.f1 = mt.f1_score(y_test, self.y_predicted, labels=labels, average=None)
+
+    def outputStatistics(self):
+        performances = open(performance_name, "w")
+
+        performances.write("Accuracy automated: %s \n" % self.acc[-1])
         performances.write("Precision per class automated: %s \n"
-                           % mt.precision_score(y_test, self.y_predicted, labels=labels, average=None))
+                           % self.prec[-1])
         performances.write("Recall per class automated: %s \n"
-                           % mt.recall_score(y_test, self.y_predicted, labels=labels, average=None))
+                           % self.recall[-1])
         performances.write("F1-score automated: %s \n"
-                           % mt.f1_score(y_test, self.y_predicted, labels=labels, average=None))
+                           % self.f1[-1])
         performances.close()
 
     def plotROCCurve(self):

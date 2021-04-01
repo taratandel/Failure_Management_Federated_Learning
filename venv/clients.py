@@ -40,12 +40,12 @@ class Client:
     def _cleanData(self):
         self.X, self.y = cD(self.dataFrame)
 
-    def participantUpdate(self, coefs, intercepts, epochs, M, learning_rate):
+    def participantUpdate(self, coefs, intercepts, epochs, M, regularization):
         """
         Update it's weight according to the parameters and the weights gained by the server
 
-        :param learning_rate: float
-            the learning rate of the learner
+        :param regularization: float
+            L2 Penalty of the learner
         :param intercepts: []
             the intercepts that are coming form the server
         :param coefs: []
@@ -57,7 +57,7 @@ class Client:
         :return:
             the locally updated weights
         """
-        return trainANN(self.X, self.y, epochs, M, coefs, intercepts)
+        return trainANN(self.X, self.y, epochs, M, coefs, intercepts, regularization)
 
     def getNumberOfSamples(self):
         """

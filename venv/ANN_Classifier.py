@@ -33,17 +33,21 @@ class MLPClassifierOverride(MLPClassifier):
         return coef_init, intercept_init
 
 
-def trainANN(X_train, y, epochs, M, coef, intercept, learning_rate):
-    best_layers = 3
-    best_neurons = 100
-    best_activation = "tanh"
+def trainANN(X_train, y, epochs, M, coef, intercept, regularization_rate=0.0001, layers=3, neurons=100, activation="tanh"):
+    layers = layers
+    neurons = neurons
+    activation = activation
 
     # Create the object of the best model according to Cross-Validation
-    size = (best_neurons,) * best_layers  # Create the structure of the Artificial Neural Network
+    size = (neurons,) * layers  # Create the structure of the Artificial Neural Network
     if M == math.inf:
         M = 'auto'
-    ann = MLPClassifierOverride(hidden_layer_sizes=size, activation=best_activation,
-                                solver='adam', learning_rate='invscaling', max_iter=epochs, batch_size=M, alpha=learning_rate)
+    ann = MLPClassifierOverride(hidden_layer_sizes=size, activation=activation,
+                                solver='sgd', learning_rate='adaptive', max_iter=epochs, batch_size=M, alpha=regularization_rate)
+    if epochs is None:
+        ann = MLPClassifierOverride(hidden_layer_sizes=size, activation=activation,
+                                    solver='sgd', learning_rate='adaptive', batch_size=M,
+                                    alpha=regularization_rate)
     ann.coef = coef
     ann.intercep = intercept
     ann.fit(X_train, y)

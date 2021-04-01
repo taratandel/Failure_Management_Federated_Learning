@@ -29,7 +29,6 @@ class Coordinator:
 
     received_intercept = []
     received_coefs = []
-    received_models = []
     agg_weights = []
     clients = []
 
@@ -87,14 +86,14 @@ class Coordinator:
     def receiveModels(self, model):
         """
         receive the weights from the clients and keep them all together
-        :param model: []
+        :param model: model
             and array of intercepts and coefficients from the current the client
         """
-        self.received_models.append(model)
+        self.received_models = model
         self.received_intercept.append(model.intercepts_)
         self.received_coefs.append(model.coefs_)
 
-    def aggregateTheReceivedModels(self, criteria='w', should_empty=True):
+    def aggregateTheReceivedModels(self, criteria='w'):
         """
         aggregate the weights and intercepts of all the clients based in the specified criteria
 
@@ -110,8 +109,7 @@ class Coordinator:
             agg_weights = weightedAverageModel(self.received_intercept, self.received_coefs, self.__getClientsSamples())
         self.received_coefs = []
         self.received_intercept = []
-        if should_empty:
-            self.received_models = []
+
         return agg_weights
 
     def __getClientsSamples(self):
@@ -129,8 +127,8 @@ class Coordinator:
     def checkForConvergence(self):
         return true
 
-    def broadcast(self, avg_weights, i):
-        model = self.received_models[i]
+    def broadcast(self, avg_weights):
+        model = self.received_models
         model.coefs_ = avg_weights[1]
         model.intercepts_ = avg_weights[0]
         return model
