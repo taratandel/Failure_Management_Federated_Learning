@@ -1,5 +1,6 @@
 from dataDivider import loadDataFrame as lDF
 from dataDivider import cleanData as cD
+from dataDivider import divideTestSet
 from ANN_Classifier import *
 import math
 import pandas as pd
@@ -12,8 +13,7 @@ class Client:
     train a machine learning model
     """
 
-
-    def __init__(self, data=None, path=None):
+    def __init__(self, data=None, path=None, prepare_for_testing=False):
 
         """
         initialize the client class
@@ -34,10 +34,15 @@ class Client:
             dataFrame = lDF(path)
         else:
             raise Exception("Sorry, provide a data or a path. both cannot be empty")
+        if prepare_for_testing:
+            train, test = divideTestSet(self.dataFrame)
+            self.dataFrame = train
+            self.test = test
+            self.X_test, self.y_test = self.__cleanData(test)
         self.__cleanData(dataFrame)
 
     def __cleanData(self, dataFrame):
-        self.X, self.y = cD(dataFrame)
+        return cD(dataFrame)
 
     def _cleanData(self):
         self.X, self.y = cD(self.dataFrame)
@@ -68,3 +73,7 @@ class Client:
             it returns the number of samples of the client
         """
         return len(self.X)
+
+    def setTest(self, X_test, y_test):
+        self.X_test = X_test
+        self.y_test = y_test

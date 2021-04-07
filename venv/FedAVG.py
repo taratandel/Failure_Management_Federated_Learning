@@ -1,6 +1,6 @@
 from coordinator import *
 from clients import *
-from dataDivider import cleanData, loadDataFrame
+from dataDivider import cleanData, loadDataFrame, prepareDataSet
 from ANN_Classifier import *
 from modelTester import *
 import math
@@ -59,48 +59,64 @@ def runFedAvg(epoch, m, regularization):
     return rounds_acc[-1]
 
 
-# creates the client with the given data
-clients = []
-for i in range(1, 4):
-    name = "df" + str(i) + ".csv"
-    client = Client(path=name)
-    clients.append(client)
-
-test = loadDataFrame("test.csv")
-X_test, y_test = cD(test)
-
-epochs = 200
-batch_size = 50
-rounds = 1000
-current_acc = 0
-best_epochs = 0
-best_batch_size = 0
-best_regularization_term = 0
-list_param = []
-for epoch in range(1, epochs, 10):
-    for m in list(range(1, batch_size, 10)) + [math.inf]:
-        for regularization in [0.1, 0.001, 0.00001, 0.0000001]:
-            list_param.append([epoch, m, regularization])
-
-for i in range(0, len(list_param)):
-    epoch = list_param[i][0]
-    m = list_param[i][1]
-    regularization = list_param[i][2]
-    acc = runFedAvg(epoch, m, regularization)
-    if acc > current_acc:
-        current_acc = acc
-        best_epochs = epoch
-        best_batch_size = m
-        best_regularization_term = regularization
-
-print("best epoch:" + str(best_epochs) + "\n" +
-      "best mini_batch size:" + str(best_batch_size) + "\n" +
-      "best regularization term:" + str(best_regularization_term))
+#
+#
+# epochs = 200
+# batch_size = 50
+# rounds = 1000
+# current_acc = 0
+# best_epochs = 0
+# best_batch_size = 0
+# best_regularization_term = 0
+# list_param = []
+# for epoch in range(1, epochs, 10):
+#     for m in list(range(1, batch_size, 10)) + [math.inf]:
+#         for regularization in [0.1, 0.001, 0.00001, 0.0000001]:
+#             list_param.append([epoch, m, regularization])
+#
+# for i in range(0, len(list_param)):
+#     epoch = list_param[i][0]
+#     m = list_param[i][1]
+#     regularization = list_param[i][2]
+#     acc = runFedAvg(epoch, m, regularization)
+#     if acc > current_acc:
+#         current_acc = acc
+#         best_epochs = epoch
+#         best_batch_size = m
+#         best_regularization_term = regularization
+#
+# print("best epoch:" + str(best_epochs) + "\n" +
+#       "best mini_batch size:" + str(best_batch_size) + "\n" +
+#       "best regularization term:" + str(best_regularization_term))
 
 # ------------------------------------------------ Model Comparison -------------------------------------
 # here we try to compare the performance of the model in two cases: trained alone or in collaborative mode
 # -------------------------------------------------------------------------------------------------------
+# First TEsting model
+test_separated = prepareDataSet()
+test = loadDataFrame("test.csv")
+X_test, y_test = cD(test)
 
+
+test_not_separated = prepareDataSet(False)
+for i in  range(1, len(test_separated)+1):
+    test_separated[i-1].to_csv("test_separated.csv" + str(i), index=False)
+    test_not_separated[i-1].to_csv("test_not_separated.csv" + str(i), index=False)
+# creates the client with the given data
+# clients_tns = []
+# clients_ts = []
+#
+# for i in range(1, 4):
+#     client = Client(data=test_separated[i])
+#     # second scenario
+#     X, y = cD(divideRandomly(test, calcFractions(test_separated)))
+#     client.setTest(X,y)
+#     clients_ts.append(client)
+#
+#     # Third scenario
+#     client = Client(data=test_not_separated[i], prepare_for_testing=True)
+#     clients_tns.append(client)
+#
 # for i in range(len(clients)):
 #     # train a model for each client without collaborating with other clients
 #     client = clients[i]
