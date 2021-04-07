@@ -11,8 +11,7 @@ class Client:
     This class is a representation of the participants that are willing to collaboratively
     train a machine learning model
     """
-    dataFrame: pd.DataFrame
-    weights = []
+
 
     def __init__(self, data=None, path=None):
 
@@ -25,6 +24,9 @@ class Client:
         :exception
             if both data and path are None. we need at least one to initialize our data
         """
+
+        self.dataFrame: pd.DataFrame
+        self.weights = []
 
         if data is not None:
             dataFrame = data

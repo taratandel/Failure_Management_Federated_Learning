@@ -27,32 +27,27 @@ class Coordinator:
      (also known as parameter server or aggregation server).
      A typical assumption is that the participants are honest whereas the server is honest-but-curious"""
 
-    received_intercept = []
-    received_coefs = []
-    agg_weights = []
-    clients = []
-
-    def __init__(self, epochs, rho=1, S=1, M=math.inf):
+    def __init__(self, epochs=1, rho=1, M=math.inf):
         """
-        We may set M = inf and S = 1 to produce a form of SGD with a varying mini-batch size.
+        We may set M = inf and epochs = 1 to produce a form of SGD with a varying mini-batch size.
 
-        :param epochs: int
-            the number of local of epoch for each client
         :param rho: float
             the fraction of clients that perform computation during each round.
              rho controls the global batch size, with rho = 1 corresponding to the full-batch gradient
              descent using all data held by all participants.
-        :param S: int
+        :param epochs: int
             the number of training steps each client performs over its local dataset
             during each round (i.e., the number of local epochs)
         :param M: int
             the mini-batch size used for the client updates.
             We use M = inf to indicate that the full local dataset is treated as a single mini-batch.
         """
-
+        self.received_intercept = []
+        self.received_coefs = []
+        self.agg_weights = []
+        self.clients = []
         self.epochs = epochs
         self.rho = rho
-        self.S = S
         self.M = M
 
     def pickClients(self, rho=1):
@@ -68,7 +63,6 @@ class Coordinator:
         if (rho == 1) | (rho < 1):
             chosen_clients = self.clients
         else:
-
             if rho > 1:
                 chosen_clients = random.choice(self.clients)
 

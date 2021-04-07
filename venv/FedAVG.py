@@ -6,57 +6,96 @@ from modelTester import *
 import math
 from numpy import linspace as lsp
 import joblib
+import time
+
 
 # -------------------------------------------- FEDAVG Algorithm --------------------------------------------
 #                                               Qiang Yang, Yang Liu, et al.
 #                        Synthesis Lectures on Artificial Intelligence and Machine Learning.
 #                                             Morgan & Claypool Publishers, 2020
 # -----------------------------------------------------------------------------------------------------------
+
+def runFedAvg(epoch, m, regularization):
+    # create an instance of a coordinator
+
+    coordinator = Coordinator(epoch, M=m)
+    # registers the clients as a participant in the coordinator
+    coordinator.registerClient(clients)
+
+    # the number of total rounds before the learning stops
+    # there are other criteria to stop the training for start we say rounds.
+    average_weights = None
+    rounds_acc = []
+    for r in range(rounds):
+        print("round:" + str(r))
+        # coordinator pick the client this can be even a fraction of them that is parametrized by
+        # rho if rho = 1 then coordinator selects all the clients. default is rho=1
+        # example: coordinator.pickTheClient(rho=0.2)
+        chosen_clients = coordinator.pickClients()
+        # after the clients had been chosen now all of should start learning
+        for client in chosen_clients:
+            if average_weights is None:
+                # train the client with the specified parameters set by the server
+                model = client.participantUpdate(coefs=None, intercepts=None, epochs=coordinator.epochs,
+                                                 M=coordinator.M, regularization=regularization)
+            else:
+                model = client.participantUpdate(coefs=average_weights[1], intercepts=average_weights[0],
+                                                 epochs=coordinator.epochs, M=coordinator.M, regularization=
+                                                 regularization)
+            coordinator.receiveModels(model)
+            # model = None
+            # client = None
+
+        average_weights = coordinator.aggregateTheReceivedModels()
+        # chosen_clients = None
+        final_model = coordinator.broadcast(average_weights)
+        tester_collaborative = ModelTester(X_test, y_test, final_model)
+        tester_collaborative.calcStatistic()
+
+        rounds_acc.append(tester_collaborative.acc)
+    name_plt = "accuracy-round plot epoch = " + str(epoch) + "regularization_term:" + \
+               str(regularization) + "mini_batch size:" + str(m)
+    plotSimpleFigure(rounds_acc, 'rounds', 'accuracy', name_plt)
+    return rounds_acc[-1]
+
+
 # creates the client with the given data
 clients = []
 for i in range(1, 4):
     name = "df" + str(i) + ".csv"
     client = Client(path=name)
     clients.append(client)
-epochs = 1
-# create an instance of a coordinator
-coordinator = Coordinator(epochs)
-# registers the clients as a participant in the coordinator
-coordinator.registerClient(clients)
+
 test = loadDataFrame("test.csv")
 X_test, y_test = cD(test)
-# the number of total rounds before the learning stops
-# there are other criteria to stop the training for start we say rounds.
-rounds = 5000
-average_weights = None
-rounds_acc = []
-for i in range(rounds):
-    print("round:" + str(i))
-    # coordinator pick the client this can be even a fraction of them that is parametrized by
-    # rho if rho = 1 then coordinator selects all the clients. default is rho=1
-    # example: coordinator.pickTheClient(rho=0.2)
-    chosen_clients = coordinator.pickClients()
-    # after the clients had been chosen now all of should start learning
-    for client in chosen_clients:
-        if average_weights is None:
-            # train the client with the specified parameters set by the server
-            model = client.participantUpdate(coefs=None, intercepts=None, epochs=coordinator.epochs, M=coordinator.M, regularization=0.00000001)
-        else:
-            model = client.participantUpdate(coefs=average_weights[1], intercepts=average_weights[0],
-                                             epochs=coordinator.epochs, M=coordinator.M,regularization=0.00000001)
-        coordinator.receiveModels(model)
-        model = None
-        client = None
 
-    average_weights = coordinator.aggregateTheReceivedModels()
-    chosen_clients = None
-    final_model = coordinator.broadcast(average_weights)
-    tester_collaborative = ModelTester(X_test, y_test, final_model)
-    tester_collaborative.calcStatistic("test_collaborative client number:" + str(i))
+epochs = 200
+batch_size = 50
+rounds = 1000
+current_acc = 0
+best_epochs = 0
+best_batch_size = 0
+best_regularization_term = 0
+list_param = []
+for epoch in range(1, epochs, 10):
+    for m in list(range(1, batch_size, 10)) + [math.inf]:
+        for regularization in [0.1, 0.001, 0.00001, 0.0000001]:
+            list_param.append([epoch, m, regularization])
 
-    rounds_acc.append(tester_collaborative.acc)
+for i in range(0, len(list_param)):
+    epoch = list_param[i][0]
+    m = list_param[i][1]
+    regularization = list_param[i][2]
+    acc = runFedAvg(epoch, m, regularization)
+    if acc > current_acc:
+        current_acc = acc
+        best_epochs = epoch
+        best_batch_size = m
+        best_regularization_term = regularization
 
-plotSimpleFigure(rounds_acc, 'rounds', 'accuracy', "accuracy-round plot")
+print("best epoch:" + str(best_epochs) + "\n" +
+      "best mini_batch size:" + str(best_batch_size) + "\n" +
+      "best regularization term:" + str(best_regularization_term))
 
 # ------------------------------------------------ Model Comparison -------------------------------------
 # here we try to compare the performance of the model in two cases: trained alone or in collaborative mode
@@ -73,6 +112,3 @@ plotSimpleFigure(rounds_acc, 'rounds', 'accuracy', "accuracy-round plot")
 #     # create the tester for the same client but this time it trained collaboratively
 #     final_model = coordinator.broadcast(average_weights, i)
 #     tester_alone.calcStatistic("test_alone client number:" + str(i))
-
-
-

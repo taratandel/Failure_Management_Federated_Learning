@@ -90,7 +90,7 @@ class ModelTester:
         # For each point, predict the probability to belong to each class
         self.y_probability = self.model.predict_proba(self.X)
 
-    def calcStatistic(self, performance_name):
+    def calcStatistic(self):
         # Open the file where will be saved all the test performances
         y_test = np.argmax(self.y, axis=1)
         # create a structure to perform the measure manually
