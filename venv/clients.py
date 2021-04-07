@@ -29,9 +29,9 @@ class Client:
         self.weights = []
 
         if data is not None:
-            dataFrame = data
+            self.dataFrame = data
         elif path is not None:
-            dataFrame = lDF(path)
+            self.dataFrame = lDF(path)
         else:
             raise Exception("Sorry, provide a data or a path. both cannot be empty")
         if prepare_for_testing:
@@ -39,7 +39,7 @@ class Client:
             self.dataFrame = train
             self.test = test
             self.X_test, self.y_test = self.__cleanData(test)
-        self.__cleanData(dataFrame)
+        self._cleanData()
 
     def __cleanData(self, dataFrame):
         return cD(dataFrame)

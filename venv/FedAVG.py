@@ -1,6 +1,6 @@
 from coordinator import *
 from clients import *
-from dataDivider import cleanData, loadDataFrame, prepareDataSet
+from dataDivider import cleanData, loadDataFrame, divideRandomly, calcFractions
 from ANN_Classifier import *
 from modelTester import *
 import math
@@ -15,7 +15,7 @@ import time
 #                                             Morgan & Claypool Publishers, 2020
 # -----------------------------------------------------------------------------------------------------------
 
-def runFedAvg(epoch, m, regularization):
+def runFedAvg(epoch, m, regularization, clients):
     # create an instance of a coordinator
 
     coordinator = Coordinator(epoch, M=m)
@@ -26,6 +26,7 @@ def runFedAvg(epoch, m, regularization):
     # there are other criteria to stop the training for start we say rounds.
     average_weights = None
     rounds_acc = []
+    rounds = 10000
     for r in range(rounds):
         print("round:" + str(r))
         # coordinator pick the client this can be even a fraction of them that is parametrized by
@@ -49,7 +50,7 @@ def runFedAvg(epoch, m, regularization):
         average_weights = coordinator.aggregateTheReceivedModels()
         # chosen_clients = None
         final_model = coordinator.broadcast(average_weights)
-        joblib.dump(final_model, filename="finalmodel")
+        joblib.dump(final_model, filename="final_model_test_separated")
         tester_collaborative = ModelTester(X_test, y_test, final_model)
         tester_collaborative.calcStatistic()
 
@@ -94,30 +95,32 @@ def runFedAvg(epoch, m, regularization):
 # here we try to compare the performance of the model in two cases: trained alone or in collaborative mode
 # -------------------------------------------------------------------------------------------------------
 # First TEsting model
-test_separated = prepareDataSet()
+test_separated = []
 test = loadDataFrame("test.csv")
 X_test, y_test = cD(test)
 
 
-test_not_separated = prepareDataSet(False)
-for i in  range(1, len(test_separated)+1):
-    test_separated[i-1].to_csv("test_separated.csv" + str(i), index=False)
-    test_not_separated[i-1].to_csv("test_not_separated.csv" + str(i), index=False)
+test_not_separated = []
+for i in range (1, 4):
+    name = "test_separated.csv" + str(i)
+    test_separated.append(loadDataFrame(name))
+
 # creates the client with the given data
-# clients_tns = []
-# clients_ts = []
-#
-# for i in range(1, 4):
-#     client = Client(data=test_separated[i])
-#     # second scenario
-#     X, y = cD(divideRandomly(test, calcFractions(test_separated)))
-#     client.setTest(X,y)
-#     clients_ts.append(client)
-#
-#     # Third scenario
-#     client = Client(data=test_not_separated[i], prepare_for_testing=True)
-#     clients_tns.append(client)
-#
+clients_tns = []
+clients_ts = []
+
+for i in range(0, 3):
+    client = Client(data=test_separated[i])
+    # second scenario
+    # X, y = cD(divideRandomly(test, calcFractions(test_separated)))
+    # client.setTest(X,y)
+    clients_ts.append(client)
+
+    # Third scenario
+    # client = Client(data=test_not_separated[i], prepare_for_testing=True)
+    # clients_tns.append(client)
+
+runFedAvg(1, 20, 0.1, clients_ts)
 # for i in range(len(clients)):
 #     # train a model for each client without collaborating with other clients
 #     client = clients[i]
