@@ -49,6 +49,7 @@ def runFedAvg(epoch, m, regularization):
         average_weights = coordinator.aggregateTheReceivedModels()
         # chosen_clients = None
         final_model = coordinator.broadcast(average_weights)
+        joblib.dump(final_model, filename="finalmodel")
         tester_collaborative = ModelTester(X_test, y_test, final_model)
         tester_collaborative.calcStatistic()
 
