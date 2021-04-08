@@ -104,31 +104,57 @@ test_not_separated = []
 for i in range (1, 4):
     name = "test_separated.csv" + str(i)
     test_separated.append(loadDataFrame(name))
+    name = "test_not_separated.csv" + str(i)
+    test_not_separated.append(loadDataFrame(name))
 
 # creates the client with the given data
 clients_tns = []
 clients_ts = []
-
+tests_df = divideRandomly(test, calcFractions(test_separated))
 for i in range(0, 3):
     client = Client(data=test_separated[i])
     # second scenario
-    # X, y = cD(divideRandomly(test, calcFractions(test_separated)))
-    # client.setTest(X,y)
+    X, y = cD(tests_df[i])
+    client.setTest(X, y)
     clients_ts.append(client)
 
     # Third scenario
-    # client = Client(data=test_not_separated[i], prepare_for_testing=True)
-    # clients_tns.append(client)
+    client = Client(data=test_not_separated[i], prepare_for_testing=True)
+    clients_tns.append(client)
 
-runFedAvg(1, 20, 0.1, clients_ts)
-# for i in range(len(clients)):
-#     # train a model for each client without collaborating with other clients
-#     client = clients[i]
-#     client_model = client.participantUpdate(None, None, M=math.inf, epochs=2000, regularization=0.00000001)
-#     # prepare a test set to be used for the testing phase for both models
-#
-#     # create the tester for the client trained alone
-#     tester_alone = ModelTester(X_test, y_test, client_model)
-#     # create the tester for the same client but this time it trained collaboratively
-#     final_model = coordinator.broadcast(average_weights, i)
-#     tester_alone.calcStatistic("test_alone client number:" + str(i))
+# runFedAvg(20, 20, 0.000001, clients_ts)
+final_model_ts = joblib.load("final_model_test_separated")
+final_model_tns = joblib.load("final_model_test_not_separated")
+
+for i in range(len(clients_ts)):
+    # train a model for each client without collaborating with other clients
+    client = clients_ts[i]
+    client_model = client.participantUpdate(None, None, M=math.inf, epochs=2000, regularization=0.00000001)
+    # prepare a test set to be used for the testing phase for both models
+
+    # create the tester for the client trained alone
+    tester_alone = ModelTester(client.X_test, client.y_test, client_model)
+    # create the tester for the same client but this time it trained collaboratively
+    # final_model = coordinator.broadcast(average_weights, i)
+    tester_alone.calcStatistic()
+    tester_alone.outputStatistics("test_alone client number:" + str(i))
+
+    tester_collaborative = ModelTester(client.X_test, client.y_test, final_model_ts)
+    tester_collaborative.calcStatistic()
+    tester_collaborative.outputStatistics("test_collaborative test set separated client number:" + str(i))
+
+    # scenario 3
+    client = clients_tns[i]
+    client_model = client.participantUpdate(None, None, M=math.inf, epochs=2000, regularization=0.00000001)
+    # prepare a test set to be used for the testing phase for both models
+
+    # create the tester for the client trained alone
+    tester_alone_tns = ModelTester(client.X_test, client.y_test, client_model)
+    # create the tester for the same client but this time it trained collaboratively
+    # final_model = coordinator.broadcast(average_weights, i)
+    tester_alone_tns.calcStatistic()
+    tester_alone_tns.outputStatistics("test_alone test not separated client number:" + str(i))
+
+    tester_collaborative_tns = ModelTester(client.X_test, client.y_test, final_model_tns)
+    tester_collaborative_tns.calcStatistic()
+    tester_collaborative_tns.outputStatistics("test_collaborative test set not separated client number:" + str(i))

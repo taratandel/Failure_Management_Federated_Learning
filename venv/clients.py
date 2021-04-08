@@ -25,21 +25,24 @@ class Client:
             if both data and path are None. we need at least one to initialize our data
         """
 
-        self.dataFrame: pd.DataFrame
+        # dataFrame: pd.DataFrame
         self.weights = []
 
         if data is not None:
-            self.dataFrame = data
+            dataFrame = data
         elif path is not None:
-            self.dataFrame = lDF(path)
+            dataFrame = lDF(path)
         else:
             raise Exception("Sorry, provide a data or a path. both cannot be empty")
         if prepare_for_testing:
-            train, test = divideTestSet(self.dataFrame)
-            self.dataFrame = train
-            self.test = test
+            self.dataFrame, test = divideTestSet(dataFrame)
             self.X_test, self.y_test = self.__cleanData(test)
+        else:
+            self.dataFrame = dataFrame
+
         self._cleanData()
+        self.dataFrame = []
+        self.test = []
 
     def __cleanData(self, dataFrame):
         return cD(dataFrame)

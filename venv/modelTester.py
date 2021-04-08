@@ -103,16 +103,16 @@ class ModelTester:
 
         self.f1 = mt.f1_score(y_test, self.y_predicted, labels=labels, average=None)
 
-    def outputStatistics(self):
+    def outputStatistics(self, performance_name):
         performances = open(performance_name, "w")
 
-        performances.write("Accuracy automated: %s \n" % self.acc[-1])
+        performances.write("Accuracy automated: %s \n" % self.acc)
         performances.write("Precision per class automated: %s \n"
-                           % self.prec[-1])
+                           % self.prec)
         performances.write("Recall per class automated: %s \n"
-                           % self.recall[-1])
+                           % self.recall)
         performances.write("F1-score automated: %s \n"
-                           % self.f1[-1])
+                           % self.f1)
         performances.close()
 
     def plotROCCurve(self):

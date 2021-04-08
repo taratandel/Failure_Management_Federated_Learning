@@ -16,7 +16,7 @@ from sklearn.preprocessing import StandardScaler
 
 
 def cleanData(windows):
-    windows = windows
+    windows = windows.copy(deep=True)
     #            ---------------------------------------- NAN PROCESSING ----------------------------------------
     # Identify the Transmitted power features
     tx = ['txMaxAN-2', 'txminAN-2', 'txMaxBN-2', 'txminBN-2', 'txMaxAN-1', 'txminAN-1',
