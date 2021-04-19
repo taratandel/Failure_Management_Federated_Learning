@@ -7,7 +7,7 @@ import math
 from numpy import linspace as lsp
 import joblib
 import time
-
+from modelTester import plot_learning_curve as plc
 
 # -------------------------------------------- FEDAVG Algorithm --------------------------------------------
 #                                               Qiang Yang, Yang Liu, et al.
@@ -15,7 +15,7 @@ import time
 #                                             Morgan & Claypool Publishers, 2020
 # -----------------------------------------------------------------------------------------------------------
 
-def runFedAvg(epoch, m, regularization, clients):
+def runFedAvg(epoch, m, regularization, clients, name):
     # create an instance of a coordinator
 
     coordinator = Coordinator(epoch, M=m)
@@ -50,7 +50,7 @@ def runFedAvg(epoch, m, regularization, clients):
         average_weights = coordinator.aggregateTheReceivedModels()
         # chosen_clients = None
         final_model = coordinator.broadcast(average_weights)
-        joblib.dump(final_model, filename="final_model_test_separated")
+        joblib.dump(final_model, filename=name)
         tester_collaborative = ModelTester(X_test, y_test, final_model)
         tester_collaborative.calcStatistic()
 
@@ -59,7 +59,6 @@ def runFedAvg(epoch, m, regularization, clients):
                str(regularization) + "mini_batch size:" + str(m)
     plotSimpleFigure(rounds_acc, 'rounds', 'accuracy', name_plt)
     return rounds_acc[-1]
-
 
 #
 #
@@ -121,14 +120,29 @@ for i in range(0, 3):
     # Third scenario
     client = Client(data=test_not_separated[i], prepare_for_testing=True)
     clients_tns.append(client)
+acc_ts = []
+acc_tns = []
+for m in list(range(1, 51, 10)) + [math.inf]:
+    acc_ts.append(runFedAvg(4, math.inf, 0.000001, clients_ts, "final_model_test_separated"))
+    acc_tns.append(runFedAvg(4, math.inf, 0.000001, clients_tns, "final_model_test_not_separated"))
 
-# runFedAvg(20, 20, 0.000001, clients_ts)
+name_plt = "accuracy-batch-sieze ts plot" + "\n" + " epoch = " + str(m) + "\n"
+print(name_plt)
+plotSimpleFigure(acc_ts, 'epochs', 'accuracy', name_plt, list(range(1, 51, 10)) + [60 + 1])
+name_plt = "accuracy-batch-size tns plot" + "\n" + " epoch = " + str(m) + "\n"
+print(name_plt)
+plotSimpleFigure(acc_tns, 'epochs', 'accuracy', name_plt, list(range(1, 51, 10)) + [60 + 1])
+
+# Code provided by:
 final_model_ts = joblib.load("final_model_test_separated")
 final_model_tns = joblib.load("final_model_test_not_separated")
 
 for i in range(len(clients_ts)):
+
     # train a model for each client without collaborating with other clients
     client = clients_ts[i]
+    name = "client" + str(i) + "learning curve test ont separetated"
+    plc(final_model_ts, name, client.X, client.y)
     client_model = client.participantUpdate(None, None, M=math.inf, epochs=2000, regularization=0.00000001)
     # prepare a test set to be used for the testing phase for both models
 
@@ -145,6 +159,7 @@ for i in range(len(clients_ts)):
 
     # scenario 3
     client = clients_tns[i]
+    plc(final_model_ts, name, client.X, client.y)
     client_model = client.participantUpdate(None, None, M=math.inf, epochs=2000, regularization=0.00000001)
     # prepare a test set to be used for the testing phase for both models
 
