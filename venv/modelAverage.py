@@ -27,6 +27,10 @@ def weightedAverageModel(received_intercept, received_coef, no_samples):
     return intercept, weight
 
 
+def weightedAverageloss(losses, no_samples):
+    return (sum([a * b for a, b in zip(losses, no_samples)])) / sum(no_samples)
+
+
 def iterAverageModel():
     models_params = models_param
     total = 0

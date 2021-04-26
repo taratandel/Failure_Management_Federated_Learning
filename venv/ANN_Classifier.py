@@ -23,7 +23,7 @@ class MLPClassifierOverride(MLPClassifier):
                                                (fan_in, fan_out))
         intercept_init = self._random_state.uniform(-init_bound, init_bound,
                                                     fan_out)
-        if self.coef is not None:
+        if self.coef is not None and (layer_no < len(self.coef)):
             coef_init = self.coef[layer_no]
             intercept_init = self.intercep[layer_no]
         else:
@@ -42,11 +42,13 @@ def trainANN(X_train, y, epochs, M, coef, intercept, regularization_rate=0.0001,
     size = (neurons,) * layers  # Create the structure of the Artificial Neural Network
     if M == math.inf:
         M = 'auto'
-    ann = MLPClassifierOverride(hidden_layer_sizes=size, activation=activation,
-                                solver='sgd', learning_rate='adaptive', max_iter=epochs, batch_size=M, alpha=regularization_rate)
     if epochs is None:
         ann = MLPClassifierOverride(hidden_layer_sizes=size, activation=activation,
-                                    solver='sgd', learning_rate='adaptive', batch_size=M,
+                                    solver='adam', learning_rate='invscaling', batch_size=M,
+                                    alpha=regularization_rate)
+    else:
+        ann = MLPClassifierOverride(hidden_layer_sizes=size, activation=activation,
+                                    solver='adam', learning_rate='invscaling', max_iter=epochs, batch_size=M,
                                     alpha=regularization_rate)
     ann.coef = coef
     ann.intercep = intercept

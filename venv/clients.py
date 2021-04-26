@@ -50,7 +50,7 @@ class Client:
     def _cleanData(self):
         self.X, self.y = cD(self.dataFrame)
 
-    def participantUpdate(self, coefs, intercepts, epochs, M, regularization):
+    def participantUpdate(self, coefs, intercepts,  M, regularization, epochs=None):
         """
         Update it's weight according to the parameters and the weights gained by the server
 
