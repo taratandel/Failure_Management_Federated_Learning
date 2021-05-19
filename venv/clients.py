@@ -2,6 +2,7 @@ from dataDivider import loadDataFrame as lDF
 from dataDivider import cleanData as cD
 from dataDivider import divideTestSet
 from ANN_Classifier import *
+from dataDivider import *
 import math
 import pandas as pd
 import numpy as np
@@ -50,7 +51,7 @@ class Client:
     def _cleanData(self):
         self.X, self.y = cD(self.dataFrame)
 
-    def participantUpdate(self, coefs, intercepts,  M, regularization, epochs=None):
+    def participantUpdate(self, coefs, intercepts, M, regularization, epochs=None):
         """
         Update it's weight according to the parameters and the weights gained by the server
 
@@ -80,3 +81,26 @@ class Client:
     def setTest(self, X_test, y_test):
         self.X_test = X_test
         self.y_test = y_test
+
+
+def clientBuilder():
+    test_sets, train_sets, concatenated_test, concatenated_train = prepareDataSet()
+    client_set = []
+    for i in range(len(train_sets)):
+        train = train_sets[i]
+        test = test_sets[i]
+
+        client = Client(train)
+        test_X, test_y = cD(test)
+        client.setTest(test_X, test_y)
+        client_set.append(client)
+    return client_set, test_sets, train_sets, concatenated_test, concatenated_train
+
+
+# scenario 1 is where we have three groups of randomly picked links. just to make sure that each link
+# is only in one group
+def clientBuilderForScenario1():
+    df = loadDataFrame("Labelled_Data.csv", True)
+    divided_gp = divideByLinkID(df)
+    pickedGps = pickGroups(3, divided_gp)
+    return pickedGps

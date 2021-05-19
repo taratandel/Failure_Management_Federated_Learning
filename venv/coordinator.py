@@ -135,14 +135,14 @@ class Coordinator:
     def checkForConvergence(self, round):
         print(self.weighted_loss)
         print("+++++++++++++weighted loss before+++++++++++")
-        if (self.total_unchanged_rounds > 100) and (round > 1000):
+        if (self.total_unchanged_rounds > 30) and (round > 1000):
             return True
 
         else:
             current_loss = weightedAverageloss(self.received_loss, self.__getClientsSamples())
             print(current_loss)
             print("+++++++++++++current loss+++++++++++")
-            change_percentage = (current_loss - self.weighted_loss)/self.weighted_loss
+            change_percentage = (current_loss - self.weighted_loss) / self.weighted_loss
             if change_percentage < self.epsilon:
                 self.total_unchanged_rounds = self.total_unchanged_rounds + 1
 
@@ -155,5 +155,5 @@ class Coordinator:
             self.received_loss = []
             return False
 
-
-
+    def averageAcc(self, accs):
+        return weightedAverageloss(accs, self.__getClientsSamples())

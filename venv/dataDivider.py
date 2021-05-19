@@ -3,6 +3,7 @@ import pandas as pd
 from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+import random
 
 
 # ------------------------------------- Experiments --------------------------------------------
@@ -58,7 +59,7 @@ def cleanData(windows):
     return X, y
 
 
-def loadDataFrame(path):
+def loadDataFrame(path, should_one_hot):
     """
     reads the csv file using a path
     :param path: str
@@ -66,21 +67,46 @@ def loadDataFrame(path):
     :return:
         a data frame
     """
-    return pd.read_csv(path)
+    df = pd.read_csv(path)
+    if should_one_hot:
+        df = oneHotEncode(df)
+    return df
 
 
 def divideByeqType(df):
     # create unique list of names
     unique_eqtype = df.groupby('eqtype')
     data_frames = [group for _, group in unique_eqtype]
-    i = 0
-    for data_frame in data_frames:
-        i = i + 1
-        name = 'df' + str(i) + '.csv'
-        data_frame.to_csv(name, index=False)
-        print("In entered", i)
+    print("In entered")
 
     return data_frames
+
+
+def divideByLinkID(df):
+    unique_eqtype = df.groupby('idlink')
+    data_frames = [group for _, group in unique_eqtype]
+    print("In entered idlink")
+
+    return data_frames
+
+
+def pickGroups(no_of_gp, dfs):
+    groups = [[] for _ in range(no_of_gp)]
+    df_copy = dfs.copy()
+    no_of_links = len(df_copy)
+    while no_of_links > 0:
+        for i in range(no_of_gp):
+            upperbound = no_of_links - 1
+            rand = random.randint(0, upperbound)
+            groups[i].append(df_copy[rand])
+            df_copy.pop(rand)
+            no_of_links -= 1
+    conctanated_gps = [[] for _ in range(no_of_gp)]
+
+    for i in range(no_of_gp):
+        conctanated_gps[i] = pd.concat(groups[i])
+
+    return conctanated_gps
 
 
 def calcFractions(data_frames):
@@ -124,11 +150,21 @@ def prepareDataSet(should_divide_test=True):
     # split test set with 20% (default is 20% if you want to change the percentage
     # just call the function with desire percentage example: divideTestSet(df, test_size = 0.1)
     if should_divide_test:
-        train, test = divideTestSet(df)
-        test.to_csv("test.csv", index=False)
+        return dividedTestSetPereqTyep(df)
     else:
-        train = df
-    # here I divided by the equipment type the rest of the code will work regardless of your division
-    # for your ease of use just instead of clients_train give any split you want
-    clients_train = divideByeqType(train)
-    return clients_train
+        return divideByeqType(df)
+
+
+def dividedTestSetPereqTyep(df):
+    df = df.copy(deep=True)
+    eqdfs = divideByeqType(df)
+    test_sets = []
+    train_sets = []
+    for df in eqdfs:
+        train, test = divideTestSet(df=df)
+        test_sets.append(test)
+        train_sets.append(train)
+    concatenated_train = pd.concat(train_sets)
+    concatenated_test = pd.concat(test_sets)
+
+    return test_sets, train_sets, concatenated_test, concatenated_train

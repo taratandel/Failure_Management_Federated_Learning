@@ -129,7 +129,6 @@ def plot_learning_curve(estimator, title, X, y, axes=None, ylim=None, cv=None,
     return plt
 
 
-
 def plot_confusion_matrix(y_true, y_pred, classes=[],
                           normalize=False,
                           title=None,
@@ -181,13 +180,14 @@ def plot_confusion_matrix(y_true, y_pred, classes=[],
                     ha="center", va="center",
                     color="white" if cm[w, j] > thresh else "black")
     fig.tight_layout()
+    plt.show()
     return ax
 
 
 # Code provided by: https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
 def plotSimpleFigure(values, xlabel, ylabel, title, values2=None):
     if values2 is None:
-        plt.plot(range(1, len(values)+1), values, label='accuracy')  # Plot some data on the (implicit) axes.
+        plt.plot(range(1, len(values) + 1), values, label='accuracy')  # Plot some data on the (implicit) axes.
     else:
         plt.plot(values2, values)
     plt.xlabel(xlabel)
@@ -196,6 +196,34 @@ def plotSimpleFigure(values, xlabel, ylabel, title, values2=None):
     plt.legend()
     plt.show()
 
+
+def testProcess(X_test, y_test, X_train, y_train, model, name):
+    np.set_printoptions(precision=2)
+    tester_alone = ModelTester(X_test, y_test, model)
+    # create the tester for the same client but this time it trained collaboratively
+    # final_model = coordinator.broadcast(average_weights, i)
+    tester_alone.calcStatistic()
+    tester_alone.outputStatistics(name + ":")
+    if (X_train is not None) and (y_train is not None):
+        title = name + " learning curve"
+
+        plot_learning_curve(model, title,
+                            X_train, y_train, axes=None, ylim=None, cv=10,
+                            n_jobs=None, train_sizes=np.linspace(.1, 1.0, 5))
+    title = name + " confusion matrix normalized"
+    plot_confusion_matrix(y_test.argmax(axis=1), model.predict(X_test).argmax(axis=1),
+                          classes=[0, 1, 2, 3, 4, 5],
+                          normalize=False,
+                          title=title,
+                          cmap=plt.cm.Blues)
+    title = name + " confusion matrix not normalized"
+    plot_confusion_matrix(y_test.argmax(axis=1), model.predict(X_test).argmax(axis=1),
+                          classes=[0, 1, 2, 3, 4, 5],
+                          normalize=True,
+                          title=title,
+                          cmap=plt.cm.Blues)
+    plt.show()
+    return tester_alone.acc
 
 class ModelTester:
     """
@@ -266,16 +294,3 @@ class ModelTester:
             # https: // scikit - learn.org / stable / auto_examples / model_selection / plot_roc.html
 
     # ----------------------------------------------------------------------------------------------------------------------
-
-    def plotConfusionMatrix(self):
-        np.set_printoptions(precision=2)
-
-        # Plot non-normalized confusion matrix
-        plot_confusion_matrix(self.y, self.y_predicted,
-                              title='Confusion matrix, without normalization')
-
-        # # Plot normalized confusion matrix
-        # plot_confusion_matrix(y_test, y_predicted, classes=labels, normalize=True,
-        #                       title='Normalized confusion matrix')
-
-        plt.show()
