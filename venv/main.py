@@ -2,32 +2,32 @@ from clients import clientBuilder as cB
 from dataDivider import *
 from modelTester import testProcess as tP
 from clients import *
-from modelAverage import  weightedAverageloss
+from modelAverage import weightedAverageloss
 from FedAVG import runFedAvg as rFA
 import matplotlib.pyplot as plt
 import math
 import joblib
 from numpy import save, load
 
-round = 1
-clients_data = clientBuilderForScenario1()
+round = 10000
 
-clients = []
-number_of_trail = 1
-for client_data in clients_data:
-    client = Client(data=client_data, prepare_for_testing=True)
-    clients.append(client)
+number_of_trail = 10
 total_acc = [[] for _ in range(number_of_trail)]
 total_fed_client_acc = [[] for _ in range(number_of_trail)]
 total_fed_round_acc = [[] for _ in range(number_of_trail)]
 for i in range(number_of_trail):
+    clients_data = clientBuilderForScenario1()
+    clients = []
+    for client_data in clients_data:
+        client = Client(data=client_data, prepare_for_testing=True)
+        clients.append(client)
     for indx in range(len(clients)):
-        client = clients[i]
+        client = clients[indx]
         X_train = client.X
         y_train = client.y
         X_test = client.X_test
         y_test = client.y_test
-        name = "training with whole data for client" + str(indx) + "round" + str(i)
+        name = "training alone for client" + str(indx) + "round" + str(i)
         ann = trainANN(X_train, y_train, epochs=round, M=math.inf, coef=None, intercept=None)
         joblib.dump(ann, filename=name)
         total_acc[i].append(tP(X_test, y_test, X_train, y_train, ann, name))
