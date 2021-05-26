@@ -104,3 +104,8 @@ def clientBuilderForScenario1():
     divided_gp = divideByLinkID(df)
     pickedGps = pickGroups(3, divided_gp)
     return pickedGps
+
+def clientBuilderForClassesPerEach():
+    df = loadDataFrame("Labelled_Data.csv")
+    divided_gp = divideByLinkID(df)
+    pickGPSForClassesPerEach(3,divided_gp)

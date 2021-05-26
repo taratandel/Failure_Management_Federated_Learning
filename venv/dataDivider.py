@@ -108,6 +108,28 @@ def pickGroups(no_of_gp, dfs):
 
     return conctanated_gps
 
+def pickGPSForClassesPerEach(no_of_gp, dfs):
+    groups = [[] for _ in range(no_of_gp)]
+    labesl = [0, 0, 0, 0, 0, 0]
+    groupSeparation = [labesl for _ in range(no_of_gp)]
+    df_copy = dfs.copy()
+    for i, df in enumerate(df_copy):
+        df_ssigned = False
+        label = int(pd.unique(df['label'])[0])
+        for gp in range(no_of_gp):
+            if groupSeparation[gp][label] == 0 and (not df_ssigned):
+                groups[gp].append(df)
+                groupSeparation[gp][label] = 1
+                df_ssigned = True
+
+        if not df_ssigned:
+            rand = random.randint(0, (no_of_gp - 1))
+            groups[rand].append(df)
+    conctanated_gps = [[] for _ in range(no_of_gp)]
+    for i in range(no_of_gp):
+        conctanated_gps[i] = pd.concat(groups[i])
+
+    return conctanated_gps
 
 def calcFractions(data_frames):
     frac = []
