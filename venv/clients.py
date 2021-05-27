@@ -108,4 +108,20 @@ def clientBuilderForScenario1():
 def clientBuilderForClassesPerEach():
     df = loadDataFrame("Labelled_Data.csv")
     divided_gp = divideByLinkID(df)
-    pickGPSForClassesPerEach(3,divided_gp)
+    pickedGps = pickGPSForClassesPerEach(3, divided_gp)
+    gps = []
+    for gp in pickedGps:
+        gps.append(oneHotEncode(gp))
+        pickGPSForClassesSelected(dfs, proportions)
+
+    return gps
+
+def clientBuilderForClassesProportional():
+    df = loadDataFrame("Labelled_Data.csv")
+    divided_gp = divideByLinkID(df)
+    pickedGps = pickGPSForClassesSelected(divided_gp, [6, 4, 4])
+    gps = []
+    for gp in pickedGps:
+        gps.append(oneHotEncode(gp))
+
+    return gps

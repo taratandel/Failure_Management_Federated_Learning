@@ -108,6 +108,7 @@ def pickGroups(no_of_gp, dfs):
 
     return conctanated_gps
 
+
 def pickGPSForClassesPerEach(no_of_gp, dfs):
     groups = [[] for _ in range(no_of_gp)]
     labesl = [0, 0, 0, 0, 0, 0]
@@ -130,6 +131,34 @@ def pickGPSForClassesPerEach(no_of_gp, dfs):
         conctanated_gps[i] = pd.concat(groups[i])
 
     return conctanated_gps
+
+
+def pickGPSForClassesSelected(dfs, proportions):
+    no_of_gp = len(proportions)
+    groups = [[] for _ in range(no_of_gp)]
+    labels = []
+    for prop in proportions:
+        labels.append(random.sample([0.0, 1.0, 2.0, 3.0, 4.0, 5.0], prop))
+    df_copy = dfs.copy()
+    previouse_group = 0
+    for df in df_copy:
+        df_ssigned = False
+        unique_labels = pd.unique(df['label'])
+
+        while not df_ssigned:
+            previouse_group = (previouse_group + 1) % 4
+            for gp in range(no_of_gp):
+                if (all(item in labels[gp] for item in unique_labels.tolist())) and ((previouse_group - gp) == 1):
+                    groups[gp].append(df)
+                    df_ssigned = True
+                    break;
+
+    conctanated_gps = [[] for _ in range(no_of_gp)]
+    for i in range(no_of_gp):
+        conctanated_gps[i] = pd.concat(groups[i])
+
+    return conctanated_gps
+
 
 def calcFractions(data_frames):
     frac = []
