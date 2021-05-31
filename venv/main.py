@@ -10,7 +10,9 @@ import joblib
 from numpy import save, load
 
 round = 10000
-
+epochs = 200
+batch_size = 50
+rounds = 1000
 number_of_trail = 10
 total_acc = [[] for _ in range(number_of_trail)]
 total_fed_client_acc = [[] for _ in range(number_of_trail)]

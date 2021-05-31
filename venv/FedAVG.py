@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 #                                             Morgan & Claypool Publishers, 2020
 # -----------------------------------------------------------------------------------------------------------
 
-def runFedAvg(epoch, m, regularization, clients, name, round):
+def runFedAvg(epoch, m, clients, rounds):
     # create an instance of a coordinator
 
     coordinator = Coordinator(epoch, M=m)
@@ -23,7 +23,6 @@ def runFedAvg(epoch, m, regularization, clients, name, round):
     rounds_acc = []
     client_acc = [[0]*round, [0]*round, [0]*round]
 
-    rounds = round
     for r in range(rounds):
         print("round:" + str(r))
         # coordinator pick the client this can be even a fraction of them that is parametrized by
