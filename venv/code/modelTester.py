@@ -225,6 +225,7 @@ def testProcess(X_test, y_test, X_train, y_train, model, name):
     plt.show()
     return tester_alone.acc
 
+
 class ModelTester:
     """
     Predict the labels and gives test statistics

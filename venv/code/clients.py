@@ -14,7 +14,7 @@ class Client:
     train a machine learning model
     """
 
-    def __init__(self, data=None, path=None, prepare_for_testing=False):
+    def __init__(self, data=None, path=None, prepare_for_testing=False, name=None):
 
         """
         initialize the client class
@@ -28,6 +28,7 @@ class Client:
 
         # dataFrame: pd.DataFrame
         self.weights = []
+        self.name = name
 
         if data is not None:
             dataFrame = data
@@ -40,7 +41,7 @@ class Client:
             self.X_test, self.y_test = self.__cleanData(test)
         else:
             self.dataFrame = dataFrame
-
+        self.printData()
         self._cleanData()
         self.dataFrame = []
         self.test = []
@@ -82,6 +83,21 @@ class Client:
         self.X_test = X_test
         self.y_test = y_test
 
+    def printData(self):
+        file_name = self.name + ".txt"
+        file = open(file_name, "w")
+        str1 = self.name + "" + str(len(self.dataFrame))
+        print(str1)
+        file.write(str1)
+        gs = self.dataFrame.groupby('label').size()
+
+        for index, value in gs.items():
+            str2 = "\n " + "client" + " " + "class number" + " " + str(index) + " " + "number of labels" + " " + str(value)
+            file.write(str2)
+            print(str2)
+
+        file.close()
+
 
 def clientBuilder():
     test_sets, train_sets, concatenated_test, concatenated_train = prepareDataSet()
@@ -99,29 +115,37 @@ def clientBuilder():
 
 # scenario 1 is where we have three groups of randomly picked links. just to make sure that each link
 # is only in one group
-def clientBuilderForScenario1():
-    df = loadDataFrame("Labelled_Data.csv", True)
+def clientBuilderForScenario1(name):
+    df = loadDataFrame("Labelled_Data.csv")
     divided_gp = divideByLinkID(df)
-    pickedGps = pickGroups(3, divided_gp)
-    return pickedGps
+    pickedGps = pickGroupsRandomly(3, divided_gp)
+    gps = buildClient(pickedGps, name)
+    return gps
 
-def clientBuilderForClassesPerEach():
+
+def clientBuilderForClassesPerEach(name):
     df = loadDataFrame("Labelled_Data.csv")
     divided_gp = divideByLinkID(df)
     pickedGps = pickGPSForClassesPerEach(3, divided_gp)
-    gps = []
-    for gp in pickedGps:
-        gps.append(oneHotEncode(gp))
-        pickGPSForClassesSelected(dfs, proportions)
+    gps = buildClient(pickedGps, name)
 
     return gps
 
-def clientBuilderForClassesProportional():
+
+def clientBuilderForClassesProportional(name):
     df = loadDataFrame("Labelled_Data.csv")
     divided_gp = divideByLinkID(df)
     pickedGps = pickGPSForClassesSelected(divided_gp, [6, 4, 4])
-    gps = []
-    for gp in pickedGps:
-        gps.append(oneHotEncode(gp))
+    gps = buildClient(pickedGps, name)
 
     return gps
+
+
+def buildClient(data_sets, name):
+    clients = []
+    i = 0
+    for data in data_sets:
+        client = Client(data=data, path=None, prepare_for_testing=True, name=name + " " + str(i))
+        clients.append(client)
+        i = i + 1
+    return clients

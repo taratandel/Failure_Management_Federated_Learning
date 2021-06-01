@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
@@ -31,7 +30,9 @@ def cleanData(windows):
 
     #           ---------------------------------------- LABELS PROCESSING ----------------------------------------
     # Put the labels inside a variable
-    y = windows[windows.columns.values[-6:]].to_numpy()
+    y = windows[windows.columns.values[-1:]].to_numpy()
+    y = oneHotEncode(y)
+
     windows = windows.fillna(-150)
 
     #         ----------------------------------------- CLEAN THE FEATURES -----------------------------------------
@@ -59,9 +60,13 @@ def cleanData(windows):
     return X, y
 
 
-def loadDataFrame(path, should_one_hot):
+def loadDataFrame(path, should_one_hot = False, should_shuffle = False):
     """
     reads the csv file using a path
+    :param should_one_hot: bool
+        returns data one hot encoded
+    :param should_shuffle:  bool
+        shuffle data randomly
     :param path: str
         path of the csv file
     :return:
@@ -70,6 +75,9 @@ def loadDataFrame(path, should_one_hot):
     df = pd.read_csv(path)
     if should_one_hot:
         df = oneHotEncode(df)
+
+    if should_shuffle:
+        df = df.sample(frac=1)
     return df
 
 
@@ -90,7 +98,7 @@ def divideByLinkID(df):
     return data_frames
 
 
-def pickGroups(no_of_gp, dfs):
+def pickGroupsRandomly(no_of_gp, dfs):
     groups = [[] for _ in range(no_of_gp)]
     df_copy = dfs.copy()
     no_of_links = len(df_copy)
@@ -177,15 +185,16 @@ def divideRandomly(df, fractions):
     return data_frames
 
 
-def oneHotEncode(df):
-    y = df.pop('label')
-    y = y.to_numpy()
-    n_label = len(set(y))
-    y_cat = to_categorical(y, num_classes=n_label)
-    list_of_labels = ['{:.1f}'.format(x) for x in list(set(y))]
-    y_df = pd.DataFrame(y_cat, columns=list_of_labels)
-    df = pd.concat([df, y_df], axis=1)
-    return df
+def oneHotEncode(y):
+    # df = df.copy(deep=True)
+    # y = df.pop('label')
+    # y = y.to_numpy()
+    # n_label = len(set(y))
+    y_cat = to_categorical(y, num_classes=6)
+    # list_of_labels = ['{:.1f}'.format(x) for x in list([0,1,2,3,4,5])]
+    # y_df = pd.DataFrame(y_cat, columns=list_of_labels)
+    # new_df = pd.concat([df, y_df], axis=1)
+    return y_cat
 
 
 def divideTestSet(df: pd.DataFrame, test_size=0.2):
@@ -195,9 +204,7 @@ def divideTestSet(df: pd.DataFrame, test_size=0.2):
 
 def prepareDataSet(should_divide_test=True):
     # Load the dataframe
-    df = loadDataFrame("Labelled_Data.csv")
-    # # On-Hot-Encode the labels
-    df = oneHotEncode(df)
+    df = loadDataFrame("Labelled_Data.csv", True)
     # split test set with 20% (default is 20% if you want to change the percentage
     # just call the function with desire percentage example: divideTestSet(df, test_size = 0.1)
     if should_divide_test:
