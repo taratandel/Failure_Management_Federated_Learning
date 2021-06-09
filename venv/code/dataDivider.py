@@ -43,7 +43,7 @@ def cleanData(windows):
     # The variable is used to address and drop some features not useful in the training and cross-validation phase
     # Delete the columns that are not useful
     windows = windows.drop(columns=columns[:8])
-    windows = windows.drop(columns=columns[-6:])
+    windows = windows.drop(columns=columns[-1:])
     # Delete the 'label' columns because we can't train a model using it as an input data
     # windows = windows.drop(columns=['label'])
     # After the elimination of the useless columns our data are described by 35 features

@@ -125,6 +125,8 @@ def plot_learning_curve(estimator, title, X, y, axes=None, ylim=None, cv=None,
     axes[2].set_xlabel("fit_times")
     axes[2].set_ylabel("Score")
     axes[2].set_title("Performance of the model")
+    plt.savefig(title + "learning_curve"+".png")
+    plt.clf()
 
     return plt
 
@@ -180,7 +182,10 @@ def plot_confusion_matrix(y_true, y_pred, classes=[],
                     ha="center", va="center",
                     color="white" if cm[w, j] > thresh else "black")
     fig.tight_layout()
-    plt.show()
+    # plt.show()
+    plt.savefig('cfm %s.png' % title)
+    plt.clf()
+
     return ax
 
 
@@ -192,17 +197,21 @@ def plotSimpleFigure(values, xlabel, ylabel, title, values2=None):
         plt.plot(values2, values)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.title(title)
+    plt.title('simple curve %s.png' % title)
     plt.legend()
-    plt.show()
+    # plt.show()
+    plt.savefig('simple curve %s.png' % title)
+    plt.clf()
 
 
-def testProcess(X_test, y_test, X_train, y_train, model, name):
+def testProcess(X_test, y_test, X_train, y_train, model, name, should_plt=True):
     np.set_printoptions(precision=2)
     tester_alone = ModelTester(X_test, y_test, model)
     # create the tester for the same client but this time it trained collaboratively
     # final_model = coordinator.broadcast(average_weights, i)
     tester_alone.calcStatistic()
+    if not should_plt:
+        return tester_alone.acc
     tester_alone.outputStatistics(name + ":")
     if (X_train is not None) and (y_train is not None):
         title = name + " learning curve"
@@ -222,7 +231,8 @@ def testProcess(X_test, y_test, X_train, y_train, model, name):
                           normalize=True,
                           title=title,
                           cmap=plt.cm.Blues)
-    plt.show()
+    # plt.show()
+    # plt.savefig("%s.png" %title)
     return tester_alone.acc
 
 
@@ -292,6 +302,7 @@ class ModelTester:
             plt.title('Receiver operating characteristic example')
             plt.legend(loc="lower right")
             plt.show()
+            # plt.savefig('%s.png' % title)
             # https: // scikit - learn.org / stable / auto_examples / model_selection / plot_roc.html
 
     # ----------------------------------------------------------------------------------------------------------------------
