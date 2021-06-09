@@ -50,14 +50,28 @@ def runFedAvg(epoch, m, regularization, clients, name, round):
         clc = []
         for i in range(len(chosen_clients)):
             client = chosen_clients[i]
-            tester_collaborative = ModelTester(client.X_test, client.y_test, final_model)
-            tester_collaborative.calcStatistic()
-            clc.append(tester_collaborative.acc)
-            client_acc[i][r] = tester_collaborative.acc
+            X_test = client.X_test
+            y_test = client.y_test
+            X_train = client.X
+            y_train = client.y
+            model = final_model
+            name = client.name
+            should_plot = False
+            if r == rounds - 1:
+                should_plot = True
+
+            acc = testProcess(X_test, y_test, X_train, y_train, model, name + "round" + str(i), should_plot)
+            clc.append(acc)
+            client_acc[i][r] = acc
 
         rounds_acc.append(coordinator.averageAcc(clc))
         if coordinator.checkForConvergence(r):
             break
+    plotSimpleFigure(client_acc[0], "rounds", "accuracy for client 0", "accuracy round plot for client 0"+name, values2=None)
+    plotSimpleFigure(client_acc[1], "rounds", "accuracy for client 1", "accuracy round plot for client 1"+name, values2=None)
+    plotSimpleFigure(client_acc[2], "rounds", "accuracy for client 2", "accuracy round plot for client 2"+name, values2=None)
+    plotSimpleFigure(rounds_acc, "rounds", "accuracy average", "accuracy round plot averaged for all clients"+name, values2=None)
+
     return final_model, rounds_acc, client_acc
 
 

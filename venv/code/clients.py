@@ -29,6 +29,8 @@ class Client:
         # dataFrame: pd.DataFrame
         self.weights = []
         self.name = name
+        self.dataFrame = None
+        self.test = None
 
         if data is not None:
             dataFrame = data
@@ -37,14 +39,14 @@ class Client:
         else:
             raise Exception("Sorry, provide a data or a path. both cannot be empty")
         if prepare_for_testing:
-            self.dataFrame, test = divideTestSet(dataFrame)
-            self.X_test, self.y_test = self.__cleanData(test)
+            self.dataFrame, self.test = divideTestSet(dataFrame)
+            self.X_test, self.y_test = self.__cleanData(self.test)
         else:
             self.dataFrame = dataFrame
         self.printData()
         self._cleanData()
-        self.dataFrame = []
-        self.test = []
+        # self.dataFrame = []
+        # self.test = []
 
     def __cleanData(self, dataFrame):
         return cD(dataFrame)
@@ -84,7 +86,7 @@ class Client:
         self.y_test = y_test
 
     def printData(self):
-        file_name = self.name + ".txt"
+        file_name = self.name + " " + "clients data" + ".txt"
         file = open(file_name, "w")
         str1 = self.name + "" + str(len(self.dataFrame))
         print(str1)
