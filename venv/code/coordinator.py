@@ -27,7 +27,7 @@ class Coordinator:
      (also known as parameter server or aggregation server).
      A typical assumption is that the participants are honest whereas the server is honest-but-curious"""
 
-    def __init__(self, epochs=1, rho=1, M=math.inf, epsilon=0.05):
+    def __init__(self, epochs=1, rho=1, M=math.inf, epsilon=0.1):
         """
         We may set M = inf and epochs = 1 to produce a form of SGD with a varying mini-batch size.
 
@@ -135,7 +135,7 @@ class Coordinator:
     def checkForConvergence(self, round):
         print(self.weighted_loss)
         print("+++++++++++++weighted loss before+++++++++++")
-        if (self.total_unchanged_rounds > 20) and (round > 1200):
+        if (self.total_unchanged_rounds > 20) and (round > 500):
             return True
 
         else:

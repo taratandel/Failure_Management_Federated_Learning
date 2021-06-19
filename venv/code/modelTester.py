@@ -272,7 +272,7 @@ class ModelTester:
         self.f1 = mt.f1_score(y_test, self.y_predicted, labels=labels, average=None)
 
     def outputStatistics(self, performance_name):
-        performances = open(performance_name, "w")
+        performances = open(performance_name + " analytics", "w")
 
         performances.write("Accuracy automated: %s \n" % self.acc)
         performances.write("Precision per class automated: %s \n"
