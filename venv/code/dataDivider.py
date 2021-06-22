@@ -167,7 +167,6 @@ def pickGPSForClassesSelected(dfs, proportions):
 
     return conctanated_gps
 
-
 def calcFractions(data_frames):
     frac = []
     total = 0
@@ -178,7 +177,7 @@ def calcFractions(data_frames):
     return frac
 
 
-def divideRandomly(df, fractions):
+def divideRandomlyWithFraction(df, fractions):
     data_frames = []
     for fraction in fractions:
         data_frames.append(df.sample(frac=fraction))

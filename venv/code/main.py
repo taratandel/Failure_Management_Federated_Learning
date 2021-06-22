@@ -28,8 +28,10 @@ average_accuracy_per_class_def = []
 switcher = {
     0: "Completely Random choice",
     1: "All classes in all groups",
-    2: "proportions of [6,4,4]"
+    2: "proportions of [6,4,4]",
+    3: "Unbalanced data set with eqType proportions"
 }
+
 per_trial_total_acc = []
 
 per_trial_per_round_total_acc_fed = []
@@ -39,12 +41,13 @@ per_trial_total_acc_alone = []
 
 per_trial_total_fed_cd = []
 for trial in range(total_trails):
-    name = switcher.get(0, "nothing") + " " + "trial" + " " + str(trial)
+    name = switcher.get(3, "nothing") + " " + "trial" + " " + str(trial)
     total_scenarios_data = [
-         clientBuilderForScenario1(name),
+         # clientBuilderForScenario1(name),
                            # clientBuilderForClassesPerEach(
                             #    switcher.get(1, "nothing") + " " + "trial" + " " + str(trial)),
                             # clientBuilderForClassesProportional(switcher.get(2, "nothing") + "trial" + str(trial))
+         clientBuilderForClassesWithUnbalancedDataSet(name)
     ]
     per_scenario_total_acc = []
 

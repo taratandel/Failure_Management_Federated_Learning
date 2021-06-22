@@ -94,7 +94,8 @@ class Client:
         gs = self.dataFrame.groupby('label').size()
 
         for index, value in gs.items():
-            str2 = "\n " + "client" + " " + "class number" + " " + str(index) + " " + "number of labels" + " " + str(value)
+            str2 = "\n " + "client" + " " + "class number" + " " + str(index) + " " + "number of labels" + " " + str(
+                value)
             file.write(str2)
             print(str2)
 
@@ -130,6 +131,15 @@ def clientBuilderForClassesPerEach(name):
     divided_gp = divideByLinkID(df)
     pickedGps = pickGPSForClassesPerEach(3, divided_gp)
     gps = buildClient(pickedGps, name)
+
+    return gps
+
+
+def clientBuilderForClassesWithUnbalancedDataSet(name):
+    df = loadDataFrame("Labelled_Data.csv")
+    fractions = calcFractions(divideByeqType(df))
+    pickedGPS = divideRandomlyWithFraction(df, fractions)
+    gps = buildClient(pickedGPS, name)
 
     return gps
 
