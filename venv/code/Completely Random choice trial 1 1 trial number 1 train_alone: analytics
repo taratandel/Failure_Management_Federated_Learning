@@ -1,4 +1,0 @@
-Accuracy automated: 0.9102564102564102 
-Precision per class automated: [0.78 0.95 1.   0.75 0.93 1.  ] 
-Recall per class automated: [0.95 0.91 0.67 0.79 0.93 0.94] 
-F1-score automated: [0.86 0.93 0.8  0.77 0.93 0.97] 

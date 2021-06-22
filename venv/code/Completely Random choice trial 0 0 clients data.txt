@@ -1,7 +1,0 @@
-Completely Random choice trial 0 0519
- client class number 0.0 number of labels 102
- client class number 1.0 number of labels 52
- client class number 2.0 number of labels 28
- client class number 3.0 number of labels 74
- client class number 4.0 number of labels 8
- client class number 5.0 number of labels 255
