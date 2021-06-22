@@ -39,12 +39,12 @@ per_trial_total_acc_alone = []
 
 per_trial_total_fed_cd = []
 for trial in range(total_trails):
-    name = switcher.get(0, "nothing") + " " + "trial" + " " + str(trial)
+    name = switcher.get(2, "nothing") + " " + "trial" + " " + str(trial)
     total_scenarios_data = [
-         clientBuilderForScenario1(name),
+        # clientBuilderForScenario1(name),
                            # clientBuilderForClassesPerEach(
                             #    switcher.get(1, "nothing") + " " + "trial" + " " + str(trial)),
-                            # clientBuilderForClassesProportional(switcher.get(2, "nothing") + "trial" + str(trial))
+                            clientBuilderForClassesProportional(name)
     ]
     per_scenario_total_acc = []
 

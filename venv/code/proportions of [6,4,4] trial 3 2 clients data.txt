@@ -1,0 +1,5 @@
+proportions of [6,4,4] trial 3 2464
+ client class number 0.0 number of labels 77
+ client class number 1.0 number of labels 63
+ client class number 4.0 number of labels 146
+ client class number 5.0 number of labels 178
