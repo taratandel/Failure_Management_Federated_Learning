@@ -126,6 +126,7 @@ def plot_learning_curve(estimator, title, X, y, axes=None, ylim=None, cv=None,
     axes[2].set_ylabel("Score")
     axes[2].set_title("Performance of the model")
     plt.savefig(title + "learning_curve"+".png")
+    plt.clf()
     return plt
 
 
@@ -182,6 +183,8 @@ def plot_confusion_matrix(y_true, y_pred, classes=[],
     fig.tight_layout()
     # plt.show()
     plt.savefig('cfm %s.png' % title)
+    plt.clf()
+
     return ax
 
 
@@ -197,6 +200,8 @@ def plotSimpleFigure(values, xlabel, ylabel, title, values2=None):
     plt.legend()
     # plt.show()
     plt.savefig('simple curve %s.png' % title)
+    plt.clf()
+
 
 
 def testProcess(X_test, y_test, X_train, y_train, model, name, should_plt=True):

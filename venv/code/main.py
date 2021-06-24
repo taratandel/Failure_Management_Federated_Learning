@@ -12,10 +12,10 @@ from ANN_Classifier import *
 os.chdir(os.path.dirname(__file__))
 # -------------- Trial variables
 # we need also confusion matrix for it
-epochs = 2
-batch_size = 50
-rounds = 1
-total_trails = 1
+epochs = 50
+batch_size = 30
+rounds = 500
+total_trails = 5
 average_accuracy_per_client_alone = 0
 average_accuracy_per_client_fed = 0
 result_of_optimization = []
@@ -37,10 +37,12 @@ per_trial_total_acc_alone = []
 
 per_trial_total_fed_cd = []
 for trial in range(total_trails):
-    total_scenarios_data = [clientBuilderForScenario1(switcher.get(0, "nothing") + " " + "trial" + " " + str(trial)),
+    total_scenarios_data = [
+        # clientBuilderForScenario1(switcher.get(0, "nothing") + " " + "trial" + " " + str(trial)),
                             clientBuilderForClassesPerEach(
                                 switcher.get(1, "nothing") + " " + "trial" + " " + str(trial)),
-                            clientBuilderForClassesProportional(switcher.get(2, "nothing") + "trial" + str(trial))]
+                            # clientBuilderForClassesProportional(switcher.get(2, "nothing") + "trial" + str(trial))
+    ]
     per_scenario_total_acc = []
 
     per_scenario_total_acc_fed = []

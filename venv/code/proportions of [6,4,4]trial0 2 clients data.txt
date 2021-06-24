@@ -1,0 +1,5 @@
+proportions of [6,4,4]trial0 2192
+ client class number 0.0 number of labels 120
+ client class number 2.0 number of labels 21
+ client class number 3.0 number of labels 48
+ client class number 4.0 number of labels 3
