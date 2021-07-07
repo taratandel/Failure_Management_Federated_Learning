@@ -96,9 +96,9 @@ for trial in range(total_trails):
         acc = tP(X_test, y_test, X, y, ann_total, "total_test_for_train_alone_with_concatdata")
         per_scenario_total_acc_alone.append(acc)
 
-        # ------------- OPTIMIZE
-        optimize_name = name + " optimization"
-        best_epoch, best_batch = optimize(epochs, batch_size, scenarios, rounds, name)
+        # # ------------- OPTIMIZE
+        # optimize_name = name + " optimization"
+        # best_epoch, best_batch = optimize(epochs, batch_size, scenarios, rounds, name)
         # ------------- FedAvg
         fedavg_name = name + " fedavg"
         rounds_fed = rounds * 100
@@ -124,15 +124,15 @@ for trial in range(total_trails):
     per_trial_total_fed_cd.append(per_scenario_total_acc_fed_cd)
 
 
-average_per_trial_total_acc = np.array(per_trial_total_acc).mean(axis=0).astype(int).tolist()
-
-
-average_per_trial_per_round_total_acc_fed = np.array(per_trial_total_acc).mean(axis=0).astype(int).tolist()
-average_per_trial_per_round_per_client_acc_fed = np.array(per_trial_per_round_per_client_acc_fed).mean(axis=0).astype(int).tolist()
-
-average_per_trial_total_acc_alone = np.array(per_trial_total_acc_alone).mean(axis=0).astype(int).tolist()
-
-average_per_trial_total_fed_cd = np.array(per_trial_total_fed_cd).mean(axis=0).astype(int).tolist()
+# average_per_trial_total_acc = np.array(per_trial_total_acc).mean(axis=0).astype(int).tolist()
+#
+#
+# average_per_trial_per_round_total_acc_fed = np.array(per_trial_total_acc).mean(axis=0).astype(int).tolist()
+# average_per_trial_per_round_per_client_acc_fed = np.array(per_trial_per_round_per_client_acc_fed).mean(axis=0).astype(int).tolist()
+#
+# average_per_trial_total_acc_alone = np.array(per_trial_total_acc_alone).mean(axis=0).astype(int).tolist()
+#
+# average_per_trial_total_fed_cd = np.array(per_trial_total_fed_cd).mean(axis=0).astype(int).tolist()
 
 save(name + "per_trial_accuracy_per_client_alone", per_trial_total_acc)
 
