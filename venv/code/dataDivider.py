@@ -97,7 +97,6 @@ def divideByLinkID(df):
 
     return data_frames
 
-
 def pickGroupsRandomly(no_of_gp, dfs):
     groups = [[] for _ in range(no_of_gp)]
     df_copy = dfs.copy()
@@ -141,12 +140,13 @@ def pickGPSForClassesPerEach(no_of_gp, dfs):
     return conctanated_gps
 
 
-def pickGPSForClassesSelected(dfs, proportions):
+def pickGPSForClassesSelected(dfs, proportions, labels=[]):
     no_of_gp = len(proportions)
     groups = [[] for _ in range(no_of_gp)]
-    labels = []
-    for prop in proportions:
-        labels.append(random.sample([0.0, 1.0, 2.0, 3.0, 4.0, 5.0], prop))
+    labels = labels
+    if not labels:
+        for prop in proportions:
+            labels.append(random.sample([0.0, 1.0, 2.0, 3.0, 4.0, 5.0], prop))
     df_copy = dfs.copy()
     previouse_group = 0
     for df in df_copy:
@@ -159,7 +159,7 @@ def pickGPSForClassesSelected(dfs, proportions):
                 if (all(item in labels[gp] for item in unique_labels.tolist())) and ((previouse_group - gp) == 1):
                     groups[gp].append(df)
                     df_ssigned = True
-                    break;
+                    break
 
     conctanated_gps = [[] for _ in range(no_of_gp)]
     for i in range(no_of_gp):

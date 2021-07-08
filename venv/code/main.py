@@ -17,13 +17,15 @@ os.chdir(os.path.dirname(__file__))
 epochs = [10, 100, 200, 500]
 batch_size = [32, 64, 128]
 rounds = 100
-total_trails = 10
+total_trails = 5
 train_alone_epochs = None
 # ------------------------------------
 switcher = {
     0: "Completely Random choice",
     1: "All classes in all groups",
-    2: "proportions of [6,4,4]"
+    2: "proportions of [6,4,4]",
+    3: "proportions to eq type",
+    4: "1 client missing 1 class (hardwareFailure)"
 }
 
 per_trial_total_acc = []
@@ -39,8 +41,9 @@ for trial in range(total_trails):
 
     total_scenarios_data = [
         # clientBuilderForScenario1(name),
-        clientBuilderForClassesPerEach(switcher.get(1, "nothing") + " " + "trial" + " " + str(trial)),
-        # clientBuilderForClassesProportional(switcher.get(2, "nothing") + "trial" + str(trial))
+        # clientBuilderForClassesPerEach(switcher.get(1, "nothing") + " " + "trial" + " " + str(trial)),
+        #  clientBuilderForClassesProportional(switcher.get(2, "nothing") + "trial" + str(trial)),
+        clientBuilderForClientMissing1class(switcher.get(4, "nothing") + "trial" + str(trial))
     ]
 
     per_scenario_total_acc = []

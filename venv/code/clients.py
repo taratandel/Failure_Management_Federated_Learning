@@ -134,15 +134,21 @@ def clientBuilderForClassesPerEach(name):
     return gps
 
 
-def clientBuilderForClassesProportional(name):
+def clientBuilderForClassesProportional(name, proportions=[6, 4, 4]):
     df = loadDataFrame("Labelled_Data.csv")
     divided_gp = divideByLinkID(df)
-    pickedGps = pickGPSForClassesSelected(divided_gp, [6, 4, 4])
+    pickedGps = pickGPSForClassesSelected(divided_gp, proportions)
     gps = buildClient(pickedGps, name)
 
     return gps
 
+def clientBuilderForClientMissing1class(name):
+    df = loadDataFrame("Labelled_Data.csv")
+    divided_gp = divideByLinkID(df)
+    pickedGps = pickGPSForClassesSelected(divided_gp, proportions=[6,6,5], labels=[[0.0, 1.0, 2.0, 3.0, 4.0, 5.0],[0.0, 1.0, 2.0, 3.0, 4.0, 5.0],[0.0, 1.0, 2.0, 3.0, 4.0]])
+    gps = buildClient(pickedGps, name)
 
+    return gps
 def buildClient(data_sets, name):
     clients = []
     i = 0

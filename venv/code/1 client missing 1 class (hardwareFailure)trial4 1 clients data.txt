@@ -1,0 +1,7 @@
+1 client missing 1 class (hardwareFailure)trial4 1805
+ client class number 0.0 number of labels 82
+ client class number 1.0 number of labels 124
+ client class number 2.0 number of labels 21
+ client class number 3.0 number of labels 74
+ client class number 4.0 number of labels 82
+ client class number 5.0 number of labels 422

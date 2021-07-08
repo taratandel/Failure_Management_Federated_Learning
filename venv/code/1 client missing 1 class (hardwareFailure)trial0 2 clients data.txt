@@ -1,0 +1,6 @@
+1 client missing 1 class (hardwareFailure)trial0 2232
+ client class number 0.0 number of labels 73
+ client class number 1.0 number of labels 121
+ client class number 2.0 number of labels 5
+ client class number 3.0 number of labels 27
+ client class number 4.0 number of labels 6
