@@ -35,7 +35,7 @@ def optimize(epochs, batch_size, clients, rounds, name):
             plotSimpleFigure(clients_accuracy[1], 'rounds', 'accuracy of client 1', plot_name + " " + "accuracy per round "
                                                                                                  "per client 1")
             plotSimpleFigure(clients_accuracy[2], 'rounds', 'accuracy of client 2', plot_name + " " + "accuracy per round "
-                                                                                                 "per client 1")
+                                                                                                 "per client 2")
 
     print("best epoch:" + str(best_epochs) + "\n" +
           "best mini_batch size:" + str(best_batch_size))

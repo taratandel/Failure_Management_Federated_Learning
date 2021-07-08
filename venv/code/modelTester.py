@@ -219,12 +219,12 @@ def testProcess(X_test, y_test, X_train, y_train, model, name, should_plt=True):
         plot_learning_curve(model, title,
                             X_train, y_train, axes=None, ylim=None, cv=10,
                             n_jobs=None, train_sizes=np.linspace(.1, 1.0, 5))
-    title = name + " confusion matrix normalized"
-    plot_confusion_matrix(y_test.argmax(axis=1), model.predict(X_test).argmax(axis=1),
-                          classes=[0, 1, 2, 3, 4, 5],
-                          normalize=False,
-                          title=title,
-                          cmap=plt.cm.Blues)
+    # title = name + " confusion matrix normalized"
+    # plot_confusion_matrix(y_test.argmax(axis=1), model.predict(X_test).argmax(axis=1),
+    #                       classes=[0, 1, 2, 3, 4, 5],
+    #                       normalize=False,
+    #                       title=title,
+    #                       cmap=plt.cm.Blues)
     title = name + " confusion matrix not normalized"
     plot_confusion_matrix(y_test.argmax(axis=1), model.predict(X_test).argmax(axis=1),
                           classes=[0, 1, 2, 3, 4, 5],

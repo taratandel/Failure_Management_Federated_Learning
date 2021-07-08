@@ -1,0 +1,7 @@
+All classes in all groups trial 5 0529
+ client class number 0.0 number of labels 80
+ client class number 1.0 number of labels 59
+ client class number 2.0 number of labels 29
+ client class number 3.0 number of labels 32
+ client class number 4.0 number of labels 69
+ client class number 5.0 number of labels 260
