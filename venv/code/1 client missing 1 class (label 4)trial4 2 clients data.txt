@@ -1,0 +1,6 @@
+1 client missing 1 class (label 4)trial4 2508
+ client class number 0.0 number of labels 45
+ client class number 1.0 number of labels 118
+ client class number 2.0 number of labels 17
+ client class number 3.0 number of labels 78
+ client class number 5.0 number of labels 250
