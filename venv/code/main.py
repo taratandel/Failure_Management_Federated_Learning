@@ -71,7 +71,7 @@ ymin, ymax = plt.ylim()
 
 plt.ylim(.65, ymax)
 plt.show()
-plt.plot(np.arange(len(y[0]))+1, y[0], color='b', linestyle='-', label="client 3", linewidth=0.1)
+plt.plot(np.arange(len(y[0]))+1, y[2], color='b', linestyle='-', label="client 3", linewidth=0.1)
 plt.plot(np.arange(len(y[0]))+1, [0.89] * 10000, color='r', label="client 3_trained_alone", linewidth=5)
 plt.plot(np.arange(len(y[0]))+1, [0.62] * 10000, color='g', label="client 3_trained_alone_tested_on_whole_set", linewidth=5)
 
