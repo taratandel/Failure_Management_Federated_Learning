@@ -26,7 +26,8 @@ switcher = {
     2: "proportions of [6,4,4]",
     3: "proportions to eq type",
     4: "1 client missing 1 class (hardwareFailure)",
-    5: "1 client missing 1 class (label 4)"
+    5: "1 client missing 1 class (label 4)",
+    6: "1 client missing 1 class (label 2)"
 }
 
 per_trial_total_acc = []
@@ -38,13 +39,13 @@ per_trial_per_client_accuracy_on_cd_data = []
 
 for trial in range(total_trails):
 
-    name = switcher.get(5, "nothing") + " " + "trial" + " " + str(trial)
+    name = switcher.get(6, "nothing") + " " + "trial" + " " + str(trial)
 
     total_scenarios_data = [
         # clientBuilderForScenario1(name),
         # clientBuilderForClassesPerEach(switcher.get(1, "nothing") + " " + "trial" + " " + str(trial)),
         #  clientBuilderForClassesProportional(switcher.get(2, "nothing") + "trial" + str(trial)),
-        clientBuilderForClientMissing1class(switcher.get(5, "nothing") + "trial" + str(trial))
+        clientBuilderForClientMissing1class(switcher.get(6, "nothing") + "trial" + str(trial))
     ]
 
     per_scenario_total_acc = []
