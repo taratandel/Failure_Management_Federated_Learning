@@ -126,6 +126,8 @@ def plot_learning_curve(estimator, title, X, y, axes=None, ylim=None, cv=None,
     axes[2].set_ylabel("Score")
     axes[2].set_title("Performance of the model")
     plt.savefig(title + "learning_curve"+".png")
+    plt.clf()
+
     return plt
 
 
@@ -182,6 +184,8 @@ def plot_confusion_matrix(y_true, y_pred, classes=[],
     fig.tight_layout()
     # plt.show()
     plt.savefig('cfm %s.png' % title)
+    plt.clf()
+
     return ax
 
 
@@ -193,10 +197,11 @@ def plotSimpleFigure(values, xlabel, ylabel, title, values2=None):
         plt.plot(values2, values)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.title(title)
+    plt.title('simple curve %s.png' % title)
     plt.legend()
     # plt.show()
     plt.savefig('simple curve %s.png' % title)
+    plt.clf()
 
 
 def testProcess(X_test, y_test, X_train, y_train, model, name, should_plt=True):
@@ -214,12 +219,12 @@ def testProcess(X_test, y_test, X_train, y_train, model, name, should_plt=True):
         plot_learning_curve(model, title,
                             X_train, y_train, axes=None, ylim=None, cv=10,
                             n_jobs=None, train_sizes=np.linspace(.1, 1.0, 5))
-    title = name + " confusion matrix normalized"
-    plot_confusion_matrix(y_test.argmax(axis=1), model.predict(X_test).argmax(axis=1),
-                          classes=[0, 1, 2, 3, 4, 5],
-                          normalize=False,
-                          title=title,
-                          cmap=plt.cm.Blues)
+    # title = name + " confusion matrix normalized"
+    # plot_confusion_matrix(y_test.argmax(axis=1), model.predict(X_test).argmax(axis=1),
+    #                       classes=[0, 1, 2, 3, 4, 5],
+    #                       normalize=False,
+    #                       title=title,
+    #                       cmap=plt.cm.Blues)
     title = name + " confusion matrix not normalized"
     plot_confusion_matrix(y_test.argmax(axis=1), model.predict(X_test).argmax(axis=1),
                           classes=[0, 1, 2, 3, 4, 5],
@@ -267,7 +272,7 @@ class ModelTester:
         self.f1 = mt.f1_score(y_test, self.y_predicted, labels=labels, average=None)
 
     def outputStatistics(self, performance_name):
-        performances = open(performance_name, "w")
+        performances = open(performance_name + " analytics", "w")
 
         performances.write("Accuracy automated: %s \n" % self.acc)
         performances.write("Precision per class automated: %s \n"

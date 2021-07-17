@@ -60,12 +60,13 @@ def runFedAvg(epoch, m, regularization, clients, name, round):
             if r == rounds - 1:
                 should_plot = True
 
-            acc = testProcess(X_test, y_test, X_train, y_train, model, name + "round" + str(i), should_plot)
+            acc = testProcess(X_test, y_test, None, None, model, name + "round" + str(r), should_plot)
             clc.append(acc)
             client_acc[i][r] = acc
 
         rounds_acc.append(coordinator.averageAcc(clc))
         if coordinator.checkForConvergence(r):
+            testProcess(X_test, y_test, None, None, model, name + "round" + str(r), True)
             break
     plotSimpleFigure(client_acc[0], "rounds", "accuracy for client 0", "accuracy round plot for client 0"+name, values2=None)
     plotSimpleFigure(client_acc[1], "rounds", "accuracy for client 1", "accuracy round plot for client 1"+name, values2=None)
