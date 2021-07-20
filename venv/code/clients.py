@@ -8,13 +8,18 @@ import pandas as pd
 import numpy as np
 
 
+def cleanData(dataFrame):
+    return cD(dataFrame)
+
+
 class Client:
     """
     This class is a representation of the participants that are willing to collaboratively
     train a machine learning model
     """
 
-    def __init__(self, data=None, path=None, prepare_for_testing=False, name=None):
+    def __init__(self, data=None, path=None, prepare_for_random_testing=False, name=None,
+                 missing_client_train_label=None):
 
         """
         initialize the client class
@@ -38,21 +43,35 @@ class Client:
             dataFrame = lDF(path)
         else:
             raise Exception("Sorry, provide a data or a path. both cannot be empty")
-        if prepare_for_testing:
-            self.dataFrame, self.test = divideTestSet(dataFrame)
-            self.X_test, self.y_test = self.__cleanData(self.test)
-        else:
-            self.dataFrame = dataFrame
-        self.printData()
-        self._cleanData()
-        # self.dataFrame = []
-        # self.test = []
 
-    def __cleanData(self, dataFrame):
-        return cD(dataFrame)
+        if prepare_for_random_testing:
+            self.dataFrame, self.test = divideTestSet(dataFrame)
+        else:
+            self.test = dataFrame.groupby('label'). \
+                apply(lambda x: x.sample(int(len(x) * 0.2)))
+            self.dataFrame = pd.concat([dataFrame, self.test, self.test]).drop_duplicates(keep=False)
+
+        if missing_client_train_label:
+            self.dataFrame = self.dataFrame[self.dataFrame["label"] != missing_client_train_label]
+
+        self.dataFrame.to_csv(name + "train.csv", index=False)
+        self.test.to_csv(name + "test.csv", index=False)
+
+        self._cleanData()
+        self.printData()
+
+    def __init__(self, train_path, test_path, name):
+        self.weights = []
+        self.name = name
+        self.test = lDF(test_path)
+        self.dataFrame = lDF(train_path)
+        self._cleanData()
 
     def _cleanData(self):
+
+        self.X_test, self.y_test = cleanData(self.test)
         self.X, self.y = cD(self.dataFrame)
+        self.test = self.test.reset_index(drop=True)
 
     def participantUpdate(self, coefs, intercepts, M, regularization, epochs=None):
         """
@@ -88,15 +107,40 @@ class Client:
     def printData(self):
         file_name = self.name + " " + "clients data" + ".txt"
         file = open(file_name, "w")
-        str1 = self.name + "" + str(len(self.dataFrame))
+        str1 = self.name + " " + str(len(self.dataFrame)) + "\n "
         print(str1)
         file.write(str1)
         gs = self.dataFrame.groupby('label').size()
 
         for index, value in gs.items():
-            str2 = "\n " + "client" + " " + "class number" + " " + str(index) + " " + "number of labels" + " " + str(value)
+            str2 = str(index) + " " + "(" + str(value) + ")" + "\n "
+
+            # "\n " + "train" + "\n " + "client" + " " + "class number" + " " + str(index) + " " + "number of labels" + " " + str(
+            # value) + \
             file.write(str2)
             print(str2)
+        gs = self.dataFrame.groupby('idlink').size()
+
+        str2 = "\n " + "total train links: " + str(len(gs)) + "\n "
+        file.write(str2)
+        print(str2)
+
+        gs = self.test.groupby('label').size()
+        str1 = self.name + " " + str(len(self.test)) + "\n "
+        file.write(str1)
+        for index, value in gs.items():
+            str2 = str(index) + " " + "(" + str(value) + ")" + "\n "
+
+            # str2 = "\n " + "test" + "\n " + "client" + " " + "class number" + " " + str(
+            #     index) + " " + "number of labels" + " " + str(
+            #     value)
+            file.write(str2)
+            print(str2)
+        gs = self.test.groupby('idlink').size()
+
+        str2 = "\n " + "total test links: " + str(len(gs)) + "\n "
+        file.write(str2)
+        print(str2)
 
         file.close()
 
@@ -125,35 +169,46 @@ def clientBuilderForScenario1(name):
     return gps
 
 
-def clientBuilderForClassesPerEach(name):
+def clientBuilderForClassesPerEach(name, number_of_clients=3, missing_test_labels=[]):
     df = loadDataFrame("Labelled_Data.csv")
     divided_gp = divideByLinkID(df)
-    pickedGps = pickGPSForClassesPerEach(3, divided_gp)
+    pickedGps = pickGPSForClassesPerEach(number_of_clients, divided_gp)
     gps = buildClient(pickedGps, name)
 
     return gps
 
 
-def clientBuilderForClassesProportional(name, proportions=[6, 4, 4]):
+def clientBuilderForClassesProportional(name, proportions=[6, 4, 4], missingLabels=[-1, 5, 5]):
     df = loadDataFrame("Labelled_Data.csv")
     divided_gp = divideByLinkID(df)
-    pickedGps = pickGPSForClassesSelected(divided_gp, proportions)
+    pickedGps = pickGPSForClassesSelected(divided_gp, proportions, missingLabels=missingLabels)
     gps = buildClient(pickedGps, name)
 
     return gps
 
-def clientBuilderForClientMissing1class(name):
+
+def clientBuilderForClientMissingClasses(name, proportions, missing_train_and_test_Labels, missing_only_train_labels):
+    # put -1 if you wish one client to have no missing label
     df = loadDataFrame("Labelled_Data.csv")
     divided_gp = divideByLinkID(df)
-    pickedGps = pickGPSForClassesSelected(divided_gp, proportions=[6,6,5], labels=[[0.0, 1.0, 2.0, 3.0, 4.0, 5.0],[0.0, 1.0, 2.0, 3.0, 4.0, 5.0],[0.0, 1.0, 3.0, 4.0, 5.0]])
-    gps = buildClient(pickedGps, name)
+    pickedGps = pickGPSForClassesSelected(divided_gp, proportions=proportions,
+                                          missing_labels=missing_train_and_test_Labels)
+    gps = buildClient(pickedGps, name, missing_train_labels=missing_only_train_labels)
 
     return gps
-def buildClient(data_sets, name):
+
+
+def buildClient(data_sets, name, prepare_for_random_test=False, missing_train_labels=[-1, -1, -1]):
     clients = []
     i = 0
-    for data in data_sets:
-        client = Client(data=data, path=None, prepare_for_testing=True, name=name + " " + str(i))
+    for indx, data in enumerate(data_sets):
+        if len(missing_train_labels) <= indx + 1 or missing_train_labels[indx] == -1:
+            missing_client_train_label = None
+        else:
+            missing_client_train_label = missing_train_labels[indx]
+        client = Client(data=data, path=None, prepare_for_random_testing=prepare_for_random_test,
+                        name=name + " " + str(i),
+                        missing_client_train_label=missing_client_train_label)
         clients.append(client)
         i = i + 1
     return clients

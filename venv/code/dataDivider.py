@@ -60,7 +60,7 @@ def cleanData(windows):
     return X, y
 
 
-def loadDataFrame(path, should_one_hot = False, should_shuffle = False):
+def loadDataFrame(path, should_one_hot = False, should_shuffle = True):
     """
     reads the csv file using a path
     :param should_one_hot: bool
@@ -140,13 +140,16 @@ def pickGPSForClassesPerEach(no_of_gp, dfs):
     return conctanated_gps
 
 
-def pickGPSForClassesSelected(dfs, proportions, labels=[]):
+def pickGPSForClassesSelected(dfs, proportions, labels=[], missing_labels = []):
     no_of_gp = len(proportions)
     groups = [[] for _ in range(no_of_gp)]
-    labels = labels
-    if not labels:
-        for prop in proportions:
-            labels.append(random.sample([0.0, 1.0, 2.0, 3.0, 4.0, 5.0], prop))
+    labels = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0] if labels == [] else labels
+    chosen_labels = []
+    for indx, prop in enumerate(proportions):
+        complete_labels = random.sample(labels, prop)
+        if missing_labels[indx] != -1:
+            complete_labels.remove(missing_labels[indx])
+        chosen_labels.append(complete_labels)
     df_copy = dfs.copy()
     previouse_group = 0
     for df in df_copy:
@@ -156,7 +159,7 @@ def pickGPSForClassesSelected(dfs, proportions, labels=[]):
         while not df_ssigned:
             previouse_group = (previouse_group + 1) % 4
             for gp in range(no_of_gp):
-                if (all(item in labels[gp] for item in unique_labels.tolist())) and ((previouse_group - gp) == 1):
+                if (all(item in chosen_labels[gp] for item in unique_labels.tolist())) and ((previouse_group - gp) == 1):
                     groups[gp].append(df)
                     df_ssigned = True
                     break

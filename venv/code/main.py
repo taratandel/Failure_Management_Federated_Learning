@@ -9,9 +9,19 @@ import numpy as np
 from FedAVG import runFedAvg as rFA
 from Optamize import *
 from ANN_Classifier import *
-
 os.chdir(os.path.dirname(__file__))
+
+number_of_cleint = 3
+clients = []
+name = "665 missing 5"
+for i in range(number_of_cleint):
+    clients.append(Client(train_path="client %s %s train.csv" %(str(i), name), test_path="client %s %s test.csv" %(str(i), name), name = name))
+# clients = clientBuilderForClientMissingClasses("trial2", [6,6,6,6,6,6,6], [-1,-1,-1,-1,-1,-1,-1], [-1,-1,-1,-1,-1,-1,-1])
+# clients = clientBuilderForClassesPerEach("trail3", number_of_clients=7, missing_test_labels=[])
+
+print("clients")
 def tolerant_mean(arrs):
+
     lens = [len(i) for i in arrs]
     arr = np.ma.empty((np.max(lens),len(arrs)))
     arr.mask = True
@@ -19,12 +29,13 @@ def tolerant_mean(arrs):
         arr[:len(l),idx] = l
     return arr.mean(axis = -1), arr.std(axis=-1)
 
+
 # -------------- Trial variables
 # we need also confusion matrix for it
 epochs = [10, 100, 200, 500]
 batch_size = [32, 64, 128]
 rounds = 100
-total_trails = 5
+total_trails = 1
 train_alone_epochs = None
 # ------------------------------------
 switcher = {
@@ -52,7 +63,8 @@ for trial in range(total_trails):
         # clientBuilderForScenario1(name),
         # clientBuilderForClassesPerEach(switcher.get(1, "nothing") + " " + "trial" + " " + str(trial)),
         #  clientBuilderForClassesProportional(switcher.get(2, "nothing") + "trial" + str(trial)),
-        clientBuilderForClientMissing1class(switcher.get(6, "nothing") + "trial" + str(trial))
+        # clientBuilderForClientMissing1class(switcher.get(6, "nothing") + "trial" + str(trial)),
+        clients
     ]
 
     per_scenario_total_acc = []
@@ -147,7 +159,7 @@ save(name + "per_trial_per_round_per_client_acc_fed", per_trial_per_round_per_cl
 save(name + "per_trial_per_round_total_averaged_acc_fed", per_trial_per_round_total_acc_fed)
 save(name + "per_trial_total_fed_cd", per_trial_total_fed_cd)
 save(name + "per_trial_per_client_accuracy_on_cd_data", per_trial_per_client_accuracy_on_cd_data)
-name = "1 client missing 1 class (label 2) trial 4"
+name = name
 per_trial_total_acc = load(name + "per_trial_accuracy_per_client_alone.npy", allow_pickle=True)
 
 per_trial_per_round_per_client_acc_fed = load(name + "per_trial_per_round_per_client_acc_fed.npy", allow_pickle=True)
@@ -158,9 +170,9 @@ average_per_trial_total_acc_alone = load(name + "per_trial_per_client_accuracy_o
 
 
 y = []
-for j in range(3):
+for j in range(number_of_cleint):
     cr = []
-    for i in range(5):
+    for i in range(total_trails):
         cr.append(per_trial_per_round_per_client_acc_fed[i][0][j][per_trial_per_round_per_client_acc_fed[i][0][j] != 0])
     y1, error = tolerant_mean(cr)
     y.append(y1)

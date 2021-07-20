@@ -48,15 +48,23 @@ def runFedAvg(epoch, m, regularization, clients, name, round):
         # chosen_clients = None
         final_model = coordinator.broadcast(average_weights)
         clc = []
+        should_plot = False
+        should_break = False
+        if coordinator.checkForConvergence(r):
+            should_plot = True
+            should_break = True
         for i in range(len(chosen_clients)):
             client = chosen_clients[i]
             X_test = client.X_test
             y_test = client.y_test
+            # they were used for plotting learning curve just in the ```testProcess``` function pass them as variable
+            # and the function will plot you the learning curve
             X_train = client.X
             y_train = client.y
+            # ----------------------
             model = final_model
             name = client.name
-            should_plot = False
+
             if r == rounds - 1:
                 should_plot = True
 
@@ -65,13 +73,14 @@ def runFedAvg(epoch, m, regularization, clients, name, round):
             client_acc[i][r] = acc
 
         rounds_acc.append(coordinator.averageAcc(clc))
-        if coordinator.checkForConvergence(r):
-            testProcess(X_test, y_test, None, None, model, name + "round" + str(r), True)
+
+        plotSimpleFigure(rounds_acc, "rounds", "accuracy average",
+                         "accuracy round plot averaged for all clients" + name, values2=None)
+        for i in range(len(chosen_clients)):
+            plotSimpleFigure(client_acc[i], "rounds", "accuracy for client " + str(i),
+                            "accuracy round plot for client " + str(i) + " " + name, values2=None)
+        if should_break:
             break
-    plotSimpleFigure(client_acc[0], "rounds", "accuracy for client 0", "accuracy round plot for client 0"+name, values2=None)
-    plotSimpleFigure(client_acc[1], "rounds", "accuracy for client 1", "accuracy round plot for client 1"+name, values2=None)
-    plotSimpleFigure(client_acc[2], "rounds", "accuracy for client 2", "accuracy round plot for client 2"+name, values2=None)
-    plotSimpleFigure(rounds_acc, "rounds", "accuracy average", "accuracy round plot averaged for all clients"+name, values2=None)
 
     return final_model, rounds_acc, client_acc
 
