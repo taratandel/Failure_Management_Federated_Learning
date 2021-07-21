@@ -35,7 +35,7 @@ def tolerant_mean(arrs):
 epochs = [10, 100, 200, 500]
 batch_size = [32, 64, 128]
 rounds = 100
-total_trails = 1
+total_trails = 5
 train_alone_epochs = None
 # ------------------------------------
 switcher = {
