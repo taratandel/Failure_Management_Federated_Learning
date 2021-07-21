@@ -21,7 +21,8 @@ def runFedAvg(epoch, m, regularization, clients, name, round):
     # there are other criteria to stop the training for start we say rounds.
     average_weights = None
     rounds_acc = []
-    client_acc = [[0]*round, [0]*round, [0]*round]
+    round = int(round)
+    client_acc = [[0]*round]*len(clients)
 
     rounds = round
     for r in range(rounds):

@@ -125,7 +125,7 @@ def plot_learning_curve(estimator, title, X, y, axes=None, ylim=None, cv=None,
     axes[2].set_xlabel("fit_times")
     axes[2].set_ylabel("Score")
     axes[2].set_title("Performance of the model")
-    plt.savefig(title + "learning_curve"+".png")
+    plt.savefig(title + "learning_curve" + ".png")
     plt.clf()
 
     return plt
@@ -147,10 +147,13 @@ def plot_confusion_matrix(y_true, y_pred, classes=[],
 
     # Compute confusion matrix
     cm = confusion_matrix(y_true, y_pred, classes)
+    cmn = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+    acc_per_class = cmn.diagonal()
+
     # Only use the labels that appear in the data
     classes = classes
     if normalize:
-        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        cm = cmn
         print("Normalized confusion matrix")
     else:
         print('Confusion matrix, without normalization')
@@ -186,7 +189,7 @@ def plot_confusion_matrix(y_true, y_pred, classes=[],
     plt.savefig('cfm %s.png' % title)
     plt.clf()
 
-    return ax
+    return acc_per_class
 
 
 # Code provided by: https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
@@ -226,11 +229,12 @@ def testProcess(X_test, y_test, X_train, y_train, model, name, should_plt=True):
     #                       title=title,
     #                       cmap=plt.cm.Blues)
     title = name + " confusion matrix not normalized"
-    plot_confusion_matrix(y_test.argmax(axis=1), model.predict(X_test).argmax(axis=1),
-                          classes=[0, 1, 2, 3, 4, 5],
-                          normalize=True,
-                          title=title,
-                          cmap=plt.cm.Blues)
+    acc_per_class = plot_confusion_matrix(y_test.argmax(axis=1), model.predict(X_test).argmax(axis=1),
+                                          classes=[0, 1, 2, 3, 4, 5],
+                                          normalize=True,
+                                          title=title,
+                                          cmap=plt.cm.Blues)
+    tester_alone.accuracy_per_class = acc_per_class
     # plt.show()
     # plt.savefig("%s.png" %title)
     return tester_alone.acc
@@ -249,6 +253,7 @@ class ModelTester:
         self.X = X
         self.y = y
         self.model = model
+        self.accuracy_per_class = None
         self._predict()
 
     def _predict(self):
@@ -281,6 +286,8 @@ class ModelTester:
                            % self.recall)
         performances.write("F1-score automated: %s \n"
                            % self.f1)
+        performances.write("Accuracy per class: %s \n"
+                           % self.accuracy_per_class)
         performances.close()
 
     def plotROCCurve(self):
