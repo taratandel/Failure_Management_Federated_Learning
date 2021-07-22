@@ -9,40 +9,44 @@ import numpy as np
 from FedAVG import runFedAvg as rFA
 from Optamize import *
 from ANN_Classifier import *
+
 os.chdir(os.path.dirname(__file__))
 
 number_of_cleint = 3
 clients = []
 name = "trial2"
 for i in range(number_of_cleint):
-    clients.append(Client(train_path="%s %strain.csv" %(name,str(i)), test_path="%s %stest.csv" %(name, str(i)), name = name))
+    clients.append(
+        Client(train_path="%s %strain.csv" % (name, str(i)), test_path="%s %stest.csv" % (name, str(i)), name="665 missing 2" + str(i)))
 second_scenario_clients = []
 name = "665 missing 5"
 for i in range(number_of_cleint):
-    second_scenario_clients.append(Client(train_path="client %s %s train.csv" %(str(i), name), test_path="client %s %s test.csv" %(str(i), name), name = name))
+    second_scenario_clients.append(Client(train_path="client %s %s train.csv" %(str(i), name), test_path="client %s %s test.csv" %(str(i), name), name = "665 missing 5" + str(i)))
 
 third_scenario_clients = []
 number_of_cleint = 7
 name = "trail3"
 for i in range(number_of_cleint):
-    third_scenario_clients.append(Client(train_path="%s %strain.csv" %(name,str(i)), test_path="%s %stest.csv" %(name, str(i)), name = name))
+    third_scenario_clients.append(
+        Client(train_path="%s %strain.csv" % (name, str(i)), test_path="%s %stest.csv" % (name, str(i)), name="with 7 clients" + str(i)))
 
 print("clients")
-def tolerant_mean(arrs):
 
+
+def tolerant_mean(arrs):
     lens = [len(i) for i in arrs]
-    arr = np.ma.empty((np.max(lens),len(arrs)))
+    arr = np.ma.empty((np.max(lens), len(arrs)))
     arr.mask = True
     for idx, l in enumerate(arrs):
-        arr[:len(l),idx] = l
-    return arr.mean(axis = -1), arr.std(axis=-1)
+        arr[:len(l), idx] = l
+    return arr.mean(axis=-1), arr.std(axis=-1)
 
 
 # -------------- Trial variables
 # we need also confusion matrix for it
 epochs = [10, 100, 200, 500]
 batch_size = [32, 64, 128]
-rounds = 0.01
+rounds = 100
 total_trails = 1
 train_alone_epochs = 1
 # ------------------------------------
@@ -69,16 +73,15 @@ per_trial_per_client_alone_total_acc = []
 
 for trial in range(total_trails):
 
-
     total_scenarios_data = [
         # clientBuilderForScenario1(name),
         # clientBuilderForClassesPerEach(switcher.get(1, "nothing") + " " + "trial" + " " + str(trial)),
         #  clientBuilderForClassesProportional(switcher.get(2, "nothing") + "trial" + str(trial)),
         # clientBuilderForClientMissing1class(switcher.get(6, "nothing") + "trial" + str(trial)),
         # clients
-        third_scenario_clients,
+        second_scenario_clients,
         clients,
-
+        third_scenario_clients
     ]
 
     per_scenario_total_acc = []
@@ -136,7 +139,8 @@ for trial in range(total_trails):
         acc = tP(X_test, y_test, None, None, ann_total, name + "total_test_for_train_alone_with_concatdata")
         per_scenario_total_acc_alone.append(acc)
         for client in scenarios:
-            train_alone_name = name + (" trial number %s " % (trial)) + " " + "train_alone_with all the data tested one by one"
+            train_alone_name = name + (
+                        " trial number %s " % (trial)) + " " + "train_alone_with all the data tested one by one"
 
             X_train = client.X
             y_train = client.y
@@ -155,7 +159,6 @@ for trial in range(total_trails):
             client_model.append(ann)
             client_alone_total_acc.append(acc)
             i = i % 3
-
 
         # ------------- OPTIMIZE
         # optimize_name = name + " optimization"
