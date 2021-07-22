@@ -48,7 +48,7 @@ epochs = [10, 100, 200, 500]
 batch_size = [32, 64, 128]
 rounds = 100
 total_trails = 1
-train_alone_epochs = 1
+train_alone_epochs = None
 # ------------------------------------
 switcher = {
     # 0: "Completely Random choice",
@@ -123,6 +123,7 @@ for trial in range(total_trails):
                                            epochs=train_alone_epochs)
             joblib.dump(ann, train_alone_name)
             acc = tP(X_test_alone, y_test_alone, None, None, ann, train_alone_name)
+            acct = tp(X_test_alone, y_test_alone, None, None, ann_total, train_alone_name + "total+cd+data")
             client_model.append(ann)
             client_acc.append(acc)
             i = i % 3
