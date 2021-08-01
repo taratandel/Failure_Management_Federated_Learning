@@ -123,7 +123,6 @@ for trial in range(total_trails):
                                            epochs=train_alone_epochs)
             joblib.dump(ann, train_alone_name)
             acc = tP(X_test_alone, y_test_alone, None, None, ann, train_alone_name)
-            acct = tp(X_test_alone, y_test_alone, None, None, ann_total, train_alone_name + "total+cd+data")
             client_model.append(ann)
             client_acc.append(acc)
             i = i % 3
@@ -143,21 +142,19 @@ for trial in range(total_trails):
             train_alone_name = name + (
                         " trial number %s " % (trial)) + " " + "train_alone_with all the data tested one by one"
 
-            X_train = client.X
-            y_train = client.y
+
             X_test_alone = client.X_test
             y_test_alone = client.y_test
-            total_df.append(client.dataFrame)
-            total_test.append(client.test)
 
-            name_client = client.name + (" trial number %s " % (trial))
+
+            # name_client = client.name + (" trial number %s " % (trial))
             # ------------ Train alone
-            train_alone_name = name_client + "" + "train_alone"
-            ann = client.participantUpdate(coefs=None, intercepts=None, M='auto', regularization=0.000001,
-                                           epochs=train_alone_epochs)
-            joblib.dump(ann, train_alone_name)
-            acc = tP(X_test_alone, y_test_alone, None, None, ann, train_alone_name)
-            client_model.append(ann)
+            # train_alone_name = name_client + "" + "train_alone"
+            # ann = client.participantUpdate(coefs=None, intercepts=None, M='auto', regularization=0.000001,
+            #                                epochs=train_alone_epochs)
+            # joblib.dump(ann, train_alone_name)
+            acc = tP(X_test_alone, y_test_alone, None, None, ann_total, train_alone_name + client.name +"totalssl")
+            # client_model.append(ann)
             client_alone_total_acc.append(acc)
             i = i % 3
 
