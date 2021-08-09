@@ -186,7 +186,7 @@ def plot_confusion_matrix(y_true, y_pred, classes=[],
                     color="white" if cm[w, j] > thresh else "black")
     fig.tight_layout()
     # plt.show()
-    plt.savefig('cfm %s.png' % title)
+    plt.savefig('%scfm.png' % title)
     plt.clf()
 
     return acc_per_class
@@ -203,7 +203,7 @@ def plotSimpleFigure(values, xlabel, ylabel, title, values2=None):
     plt.title('simple curve %s.png' % title)
     plt.legend()
     # plt.show()
-    plt.savefig('simple curve %s.png' % title)
+    plt.savefig('%ssimple curve.png' % title)
     plt.clf()
 
 

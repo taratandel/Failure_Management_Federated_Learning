@@ -14,23 +14,28 @@ os.chdir(os.path.dirname(__file__))
 
 number_of_cleint = 3
 clients = []
-name = "trial2"
-for i in range(number_of_cleint):
-    clients.append(
-        Client(train_path="%s %strain.csv" % (name, str(i)), test_path="%s %stest.csv" % (name, str(i)), name="665 missing 2" + str(i)))
-second_scenario_clients = []
-name = "665 missing 5"
-for i in range(number_of_cleint):
-    second_scenario_clients.append(Client(train_path="client %s %s train.csv" %(str(i), name), test_path="client %s %s test.csv" %(str(i), name), name = "665 missing 5" + str(i)))
+path = "all/"
+name = "3ClientsSystematic"
+for j in range(2, 30):
+    cl = []
+    for i in range(number_of_cleint):
+        cl.append(
+            Client(train_path="%s%s/%s %s train.csv" % (path, str(j), name, str(i)), test_path="%s%s/%s %s test.csv" % (path, str(j), name, str(i)), name="%s%s/%s %s" % (path, str(j), name, str(i))))
 
-third_scenario_clients = []
-number_of_cleint = 7
-name = "trail3"
-for i in range(number_of_cleint):
-    third_scenario_clients.append(
-        Client(train_path="%s %strain.csv" % (name, str(i)), test_path="%s %stest.csv" % (name, str(i)), name="with 7 clients" + str(i)))
-
-print("clients")
+    clients.append(cl)
+# second_scenario_clients = []
+# name = "665 missing 5"
+# for i in range(number_of_cleint):
+#     second_scenario_clients.append(Client(train_path="client %s %s train.csv" %(str(i), name), test_path="client %s %s test.csv" %(str(i), name), name = "665 missing 5" + str(i)))
+#
+# third_scenario_clients = []
+# number_of_cleint = 7
+# name = "trail3"
+# for i in range(number_of_cleint):
+#     third_scenario_clients.append(
+#         Client(train_path="%s %strain.csv" % (name, str(i)), test_path="%s %stest.csv" % (name, str(i)), name="with 7 clients" + str(i)))
+#
+# print("clients")
 
 
 def tolerant_mean(arrs):
@@ -73,16 +78,16 @@ per_trial_per_client_alone_total_acc = []
 
 for trial in range(total_trails):
 
-    total_scenarios_data = [
+    total_scenarios_data = clients
+
         # clientBuilderForScenario1(name),
         # clientBuilderForClassesPerEach(switcher.get(1, "nothing") + " " + "trial" + " " + str(trial)),
         #  clientBuilderForClassesProportional(switcher.get(2, "nothing") + "trial" + str(trial)),
         # clientBuilderForClientMissing1class(switcher.get(6, "nothing") + "trial" + str(trial)),
         # clients
-        second_scenario_clients,
-        clients,
-        third_scenario_clients
-    ]
+        # second_scenario_clients,
+        # third_scenario_clients
+
 
     per_scenario_total_acc = []
 
@@ -98,7 +103,7 @@ for trial in range(total_trails):
 
     i = 0
     for indx, scenarios in enumerate(total_scenarios_data):
-        name = switcher.get(indx, "nothing") + " " + "trial" + " " + str(trial)
+        name = str(indx) + "scen"
 
         total_df = []
         total_test = []
@@ -118,7 +123,7 @@ for trial in range(total_trails):
 
             name_client = client.name + (" trial number %s " % (trial))
             # ------------ Train alone
-            train_alone_name = name_client + "" + "train_alone"
+            train_alone_name = name_client + " " + "train_alone"
             ann = client.participantUpdate(coefs=None, intercepts=None, M='auto', regularization=0.000001,
                                            epochs=train_alone_epochs)
             joblib.dump(ann, train_alone_name)
@@ -136,8 +141,8 @@ for trial in range(total_trails):
         X_test, y_test = cD(test)
         ann_total = trainANN(X, y, epochs=train_alone_epochs, M='auto', coef=None, intercept=None)
         joblib.dump(ann_total, filename=train_alone_name)
-        acc = tP(X_test, y_test, None, None, ann_total, name + "total_test_for_train_alone_with_concatdata")
-        per_scenario_total_acc_alone.append(acc)
+        # acc = tP(X_test, y_test, None, None, ann_total, name + "total_test_for_train_alone_with_concatdata")
+        # per_scenario_total_acc_alone.append(acc)
         for client in scenarios:
             train_alone_name = name + (
                         " trial number %s " % (trial)) + " " + "train_alone_with all the data tested one by one"
@@ -153,7 +158,7 @@ for trial in range(total_trails):
             # ann = client.participantUpdate(coefs=None, intercepts=None, M='auto', regularization=0.000001,
             #                                epochs=train_alone_epochs)
             # joblib.dump(ann, train_alone_name)
-            acc = tP(X_test_alone, y_test_alone, None, None, ann_total, train_alone_name + client.name +"totalssl")
+            acc = tP(X_test_alone, y_test_alone, None, None, ann_total, client.name + train_alone_name +"totalssl")
             # client_model.append(ann)
             client_alone_total_acc.append(acc)
             i = i % 3
@@ -166,6 +171,7 @@ for trial in range(total_trails):
         best_batch = 64
         fedavg_name = name + " fedavg"
         rounds_fed = rounds * 100
+
         model, round_accuracy, per_client_accuracy = rFA(epoch=best_epoch, m=best_batch, regularization=0.000001,
                                                          clients=scenarios, name=fedavg_name, round=rounds_fed)
 
@@ -198,15 +204,17 @@ save(name + "per_trial_total_fed_cd", per_trial_total_fed_cd)
 save(name + "per_trial_per_client_accuracy_on_cd_data", per_trial_per_client_accuracy_on_cd_data)
 save(name + "per_trial_per_client_alone_total_acc", per_trial_per_client_alone_total_acc)
 
-# per_trial_total_acc = load(name + "per_trial_accuracy_per_client_alone.npy", allow_pickle=True)
-#
-# per_trial_per_round_per_client_acc_fed = load(name + "per_trial_per_round_per_client_acc_fed.npy", allow_pickle=True)
-# per_trial_per_round_total_acc_fed = load(name + "per_trial_per_round_total_averaged_acc_fed.npy", allow_pickle=True)
-# per_trial_total_fed_cd = load(name + "per_trial_total_fed_cd.npy", allow_pickle=True)
-#
-# average_per_trial_total_acc_alone = load(name + "per_trial_per_client_accuracy_on_cd_data.npy", allow_pickle=True)
-#
-#
+per_trial_total_acc = load(name + "per_trial_accuracy_per_client_alone.npy", allow_pickle=True)
+
+per_trial_per_round_per_client_acc_fed = load(name + "per_trial_per_round_per_client_acc_fed.npy", allow_pickle=True)
+per_trial_per_round_total_acc_fed = load(name + "per_trial_per_round_total_averaged_acc_fed.npy", allow_pickle=True)
+per_trial_total_fed_cd = load(name + "per_trial_total_fed_cd.npy", allow_pickle=True)
+
+average_per_trial_total_acc_alone = load(name + "per_trial_per_client_accuracy_on_cd_data.npy", allow_pickle=True)
+
+print("finished")
+
+
 # y = []
 # for j in range(number_of_cleint):
 #     cr = []

@@ -72,6 +72,8 @@ class Client:
         self.X_test, self.y_test = cleanData(self.test)
         self.X, self.y = cD(self.dataFrame)
         self.test = self.test.reset_index(drop=True)
+        # self.test.to_csv(self.name + " test.csv")
+        # self.dataFrame.to_csv(self.name + " train.csv")
 
     def participantUpdate(self, coefs, intercepts, M, regularization, epochs=None):
         """

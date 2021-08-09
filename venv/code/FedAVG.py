@@ -76,10 +76,10 @@ def runFedAvg(epoch, m, regularization, clients, name, round):
         rounds_acc.append(coordinator.averageAcc(clc))
 
         plotSimpleFigure(rounds_acc, "rounds", "accuracy average",
-                         "accuracy round plot averaged for all clients" + name, values2=None)
+                         name + "accuracy round plot averaged for all clients" , values2=None)
         for i in range(len(chosen_clients)):
             plotSimpleFigure(client_acc[i], "rounds", "accuracy for client " + str(i),
-                            "accuracy round plot for client " + str(i) + " " + name, values2=None)
+                             name + "accuracy round plot for client " + str(i) + " " , values2=None)
         if should_break:
             break
 
