@@ -66,6 +66,7 @@ class Client:
         self.test = lDF(test_path)
         self.dataFrame = lDF(train_path)
         self._cleanData()
+        self.printData()
 
     def _cleanData(self):
 
