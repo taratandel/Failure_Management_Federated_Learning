@@ -135,7 +135,7 @@ class Coordinator:
     def checkForConvergence(self, round):
         print(self.weighted_loss)
         print("+++++++++++++weighted loss before+++++++++++")
-        if (self.total_unchanged_rounds > 20) and (round > 500):
+        if (self.total_unchanged_rounds > 20) and (round > 1000):
             return True
 
         else:
