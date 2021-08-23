@@ -53,7 +53,7 @@ epochs = [10, 100, 200, 500]
 batch_size = [32, 64, 128]
 rounds = 100
 total_trails = 1
-train_alone_epochs = None
+train_alone_epochs = 1000
 # ------------------------------------
 switcher = {
     # 0: "Completely Random choice",

@@ -22,7 +22,7 @@ def runFedAvg(epoch, m, regularization, clients, name, round):
     average_weights = None
     rounds_acc = []
     round = int(round)
-    client_acc = [[0]*round]*len(clients)
+    client_acc = [[None]*round]*len(clients)
 
     rounds = round
     for r in range(rounds):
@@ -72,14 +72,14 @@ def runFedAvg(epoch, m, regularization, clients, name, round):
             acc = testProcess(X_test, y_test, None, None, model, name + "round" + str(r), should_plot)
             clc.append(acc)
             client_acc[i][r] = acc
-
+        res_acc = list(filter(None, client_acc))
         rounds_acc.append(coordinator.averageAcc(clc))
-
-        plotSimpleFigure(rounds_acc, "rounds", "accuracy average",
-                         name + "accuracy round plot averaged for all clients" , values2=None)
-        for i in range(len(chosen_clients)):
-            plotSimpleFigure(client_acc[i], "rounds", "accuracy for client " + str(i),
-                             name + "accuracy round plot for client " + str(i) + " " , values2=None)
+        if should_plot:
+            plotSimpleFigure(rounds_acc, "rounds", "accuracy average",
+                             name + "accuracy round plot averaged for all clients" , values2=None)
+            for i in range(len(chosen_clients)):
+                plotSimpleFigure(res_acc[i], "rounds", "accuracy for client " + str(i),
+                                 name + "accuracy round plot for client " + str(i) + " " , values2=None)
         if should_break:
             break
 
