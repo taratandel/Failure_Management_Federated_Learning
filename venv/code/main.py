@@ -12,15 +12,15 @@ from ANN_Classifier import *
 
 os.chdir(os.path.dirname(__file__))
 
-number_of_cleint = 7
+number_of_cleint = 3
 clients = []
 path = "all/"
 name = "trail3"
-for j in range(30, 33):
+for j in range(30, 38):
     cl = []
     for i in range(number_of_cleint):
         cl.append(
-            Client(train_path="%s%s/%s %strain.csv" % (path, str(j), name, str(i)), test_path="%s%s/%s %stest.csv" % (path, str(j), name, str(i)), name="%s%s/%s %s" % (path, str(j), name, str(i))))
+            Client(train_path="%s%s/%s %s train.csv" % (path, str(j), name, str(i)), test_path="%s%s/%s %s test.csv" % (path, str(j), name, str(i)), name="%s%s/%s %s" % (path, str(j), name, str(i))))
 
     clients.append(cl)
 # second_scenario_clients = []
