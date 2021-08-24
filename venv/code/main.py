@@ -15,7 +15,7 @@ os.chdir(os.path.dirname(__file__))
 number_of_cleint = 3
 clients = []
 path = "all/"
-name = "trail3"
+name = "3ClientsSystematic"
 for j in range(30, 38):
     cl = []
     for i in range(number_of_cleint):

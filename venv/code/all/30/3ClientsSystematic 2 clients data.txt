@@ -1,0 +1,16 @@
+all/30/3ClientsSystematic 2 179
+ 1.0 (102)
+ 3.0 (54)
+ 4.0 (23)
+ 
+ total train links: 29
+ all/30/3ClientsSystematic 2 118
+ 0.0 (20)
+ 1.0 (25)
+ 2.0 (2)
+ 3.0 (13)
+ 4.0 (5)
+ 5.0 (53)
+ 
+ total test links: 41
+ 
