@@ -183,7 +183,7 @@ def plot_confusion_matrix(y_true, y_pred, classes=[],
                     color="white" if cm[w, j] > thresh else "black")
     fig.tight_layout()
     # plt.show()
-    plt.savefig('cfm %s.png' % title)
+    plt.savefig('%s_title.png' % title)
     plt.clf()
 
     return ax
