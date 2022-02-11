@@ -40,7 +40,7 @@ class Client:
             raise Exception("Sorry, provide a data or a path. both cannot be empty")
         if prepare_for_testing:
             self.dataFrame, self.test = divideTestSet(dataFrame)
-            self.X_test, self.y_test = self.__cleanData(self.test)
+            self.X_test, self.y_test = self.cleanData(self.test)
         else:
             self.dataFrame = dataFrame
         self.printData()
@@ -48,7 +48,7 @@ class Client:
         # self.dataFrame = []
         # self.test = []
 
-    def __cleanData(self, dataFrame):
+    def cleanData(self, dataFrame):
         return cD(dataFrame)
 
     def _cleanData(self):
@@ -146,7 +146,7 @@ def clientBuilderForOneClientMissing1Class(name, missingClass):
     divided_gp = divideByLinkID(df)
     labels = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
     labels.remove(missingClass)
-    pickedGps = pickGPSForClassesSelected(divided_gp, proportions=[6,6,5], labels=[[0.0, 1.0, 2.0, 3.0, 4.0, 5.0],[0.0, 1.0, 2.0, 3.0, 4.0, 5.0],[0.0, 1.0, 3.0, 4.0, 5.0]])
+    pickedGps = pickGPSForClassesSelected(divided_gp, proportions=[6,6,5], labels=[[0.0, 1.0, 2.0, 3.0, 4.0, 5.0],[0.0, 1.0, 2.0, 3.0, 4.0, 5.0],labels])
     gps = buildClient(pickedGps, name)
 
     return gps
@@ -157,6 +157,36 @@ def clientBuilderForClientMissing1class(name):
     gps = buildClient(pickedGps, name)
 
     return gps
+
+def buildClientWithPath(name, missingClass):
+    clients = []
+    for i in range(3):
+        i = i + 1
+        df = loadDataFrame("train"+str(i)+".csv")
+        if i == 1 :
+            df.drop(df[df['label'] == missingClass].index, axis=0, inplace = True)
+        client = Client(data=df, path=None, prepare_for_testing=False, name=name + " " + str(i))
+        testdf = loadDataFrame("test"+str(i)+".csv")
+        client.test = testdf
+        x_test, y_test = cD(testdf)
+        client.setTest(x_test,y_test)
+        clients.append(client)
+    return clients
+
+def buildWithoneTest(name, missingClass):
+    clients = []
+    for i in range(3):
+        i = i + 1
+        df = loadDataFrame("train" + str(i) + ".csv")
+        if i == 1:
+            df.drop(df[df['label'] == missingClass].index, axis=0, inplace=True)
+        client = Client(data=df, path=None, prepare_for_testing=False, name=name + " " + str(i))
+        testdf = loadDataFrame("test.csv")
+        client.test = testdf
+        x_test, y_test = cD(testdf)
+        client.setTest(x_test, y_test)
+        clients.append(client)
+    return clients
 def buildClient(data_sets, name):
     clients = []
     i = 0

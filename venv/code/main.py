@@ -59,7 +59,10 @@ for trial in range(total_trails):
     ]
 
     for j in range(6):
-        total_scenarios_data.append(clientBuilderForOneClientMissing1Class(switcher.get(7, "nothing") + "trial" + str(trial)+ str(j), j) )
+        total_scenarios_data.append(buildClientWithPath('splitTest' + str(j), j))
+
+    for t in range(6):
+        total_scenarios_data.append(buildClientWithPath('nonSplitTest' + str(t), t))
 
     per_scenario_total_acc = []
 
@@ -119,7 +122,7 @@ for trial in range(total_trails):
 
         completeName = os.path.join(completeName, train_alone_name)
         df = pd.concat(total_df)
-        test = pd.concat(total_test)
+        test = pd.concat(total_test).drop_duplicates().reset_index(drop=True)
         X, y = cD(df)
         X_test, y_test = cD(test)
         ann_total = trainANN(X, y, epochs=train_alone_epochs, M='auto', coef=None, intercept=None)

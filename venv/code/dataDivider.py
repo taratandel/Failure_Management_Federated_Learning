@@ -93,7 +93,6 @@ def divideByeqType(df):
 def divideByLinkID(df):
     unique_eqtype = df.groupby('idlink')
     data_frames = [group for _, group in unique_eqtype]
-    print("In entered idlink")
 
     return data_frames
 
