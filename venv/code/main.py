@@ -4,13 +4,28 @@ from modelTester import testProcess as tP
 from dataDivider import cleanData as cD
 from clients import *
 import joblib
-from numpy import save, load
 import numpy as np
 from FedAVG import runFedAvg as rFA
 from Optamize import *
 from ANN_Classifier import *
 
 os.chdir(os.path.dirname(__file__))
+for i in range(6):
+    testdf = loadDataFrame("test.csv")
+    X_test_alone, y_test_alone = cD(testdf)
+    ANNSolo = joblib.load("1 client missing 1 class (all)trial0"+str(i)+" 0 trial number 0 train_alone")
+    acc = tP(X_test_alone, y_test_alone, None, None, ANNSolo, "ANNsolo"+str(i))
+
+    i = i + 1
+    ANNFED = joblib.load("1 client missing 1 class (all)trial0 "+str(i)+" fedavg model train with FedAVG")
+    acc = tP(X_test_alone, y_test_alone, None, None, ANNFED, "fedavg"+str(i))
+
+    ANNTotal = joblib.load("1 client missing 1 class (all)trial0 "+str(i)+" trial number 0  train_alone_with all the data")
+    acc = tP(X_test_alone, y_test_alone, None, None, ANNTotal, "Anntotal"+str(i))
+
+
+
+
 def tolerant_mean(arrs):
     lens = [len(i) for i in arrs]
     arr = np.ma.empty((np.max(lens),len(arrs)))
