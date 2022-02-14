@@ -1,0 +1,6 @@
+splitTest1 1617
+ client class number 0.0 number of labels 89
+ client class number 2.0 number of labels 8
+ client class number 3.0 number of labels 57
+ client class number 4.0 number of labels 56
+ client class number 5.0 number of labels 407
