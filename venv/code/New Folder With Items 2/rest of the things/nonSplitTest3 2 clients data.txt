@@ -1,0 +1,7 @@
+nonSplitTest3 2784
+ client class number 0.0 number of labels 86
+ client class number 1.0 number of labels 184
+ client class number 2.0 number of labels 9
+ client class number 3.0 number of labels 55
+ client class number 4.0 number of labels 54
+ client class number 5.0 number of labels 396
