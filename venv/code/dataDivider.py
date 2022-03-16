@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -79,6 +80,8 @@ def loadDataFrame(path, should_one_hot = False, should_shuffle = False):
     if should_shuffle:
         df = df.sample(frac=1)
     return df
+
+
 
 
 def divideByeqType(df):
@@ -225,3 +228,34 @@ def dividedTestSetPereqTyep(df):
     concatenated_test = pd.concat(test_sets)
 
     return test_sets, train_sets, concatenated_test, concatenated_train
+
+def divideSetEqualy(df):
+    gp1Train = []
+    gp1test = []
+
+    gp2Train = []
+    gp2test = []
+
+    gp3Train = []
+    gp3test = []
+
+    unique_eqtype = df.groupby('label')
+    data_frames = [group for _, group in unique_eqtype]
+    for df in data_frames:
+        sub_dfs = np.array_split(df, 3)
+        i = 0
+        for sub_df in sub_dfs:
+            train, test = divideTestSet(df = sub_df)
+            if i == 0:
+                gp1test.append(test)
+                gp1Train.append(train)
+            elif i == 1:
+                gp2test.append(test)
+                gp2Train.append(train)
+            elif i == 2:
+                gp3test.append(test)
+                gp3Train.append(train)
+
+            i = i + 1
+
+    return pd.concat(gp1Train), pd.concat(gp1test), pd.concat(gp2Train), pd.concat(gp2test), pd.concat(gp3Train), pd.concat(gp3test),

@@ -81,6 +81,7 @@ class Client:
         """
         return len(self.X)
 
+
     def setTest(self, X_test, y_test):
         self.X_test = X_test
         self.y_test = y_test
@@ -187,6 +188,7 @@ def buildWithoneTest(name, missingClass):
         client.setTest(x_test, y_test)
         clients.append(client)
     return clients
+
 def buildClient(data_sets, name):
     clients = []
     i = 0
@@ -195,3 +197,29 @@ def buildClient(data_sets, name):
         clients.append(client)
         i = i + 1
     return clients
+
+def buildClientFairly(datasetsName, missingClass):
+    dataset = loadDataFrame(datasetsName)
+    train1, test1, train2, test2, train3, test3 = divideSetEqualy(dataset)
+    df = train1
+
+    df.drop(df[df['label'] == missingClass].index, axis=0, inplace=True)
+
+    train1 = df
+
+    client1 = Client(data=train1, path=None, prepare_for_testing=False, name="client1"+str(missingClass))
+    client1.test = test1
+    x,y = cD(test1)
+    client1.setTest(x,y)
+
+    client2 = Client(data=train2, path=None, prepare_for_testing=False, name="client2"+str(missingClass))
+    client2.test = test2
+    x,y = cD(test2)
+    client2.setTest(x,y)
+
+    client3 = Client(data=train3, path=None, prepare_for_testing=False, name="client3"+str(missingClass))
+    client3.test = test3
+    x,y = cD(test3)
+    client3.setTest(x,y)
+
+    return [client1, client2, client3]

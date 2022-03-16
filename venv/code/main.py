@@ -10,21 +10,6 @@ from Optamize import *
 from ANN_Classifier import *
 
 os.chdir(os.path.dirname(__file__))
-for i in range(6):
-    testdf = loadDataFrame("test.csv")
-    X_test_alone, y_test_alone = cD(testdf)
-    ANNSolo = joblib.load("1 client missing 1 class (all)trial0"+str(i)+" 0 trial number 0 train_alone")
-    acc = tP(X_test_alone, y_test_alone, None, None, ANNSolo, "ANNsolo"+str(i))
-
-    i = i + 1
-    ANNFED = joblib.load("1 client missing 1 class (all)trial0 "+str(i)+" fedavg model train with FedAVG")
-    acc = tP(X_test_alone, y_test_alone, None, None, ANNFED, "fedavg"+str(i))
-
-    ANNTotal = joblib.load("1 client missing 1 class (all)trial0 "+str(i)+" trial number 0  train_alone_with all the data")
-    acc = tP(X_test_alone, y_test_alone, None, None, ANNTotal, "Anntotal"+str(i))
-
-
-
 
 def tolerant_mean(arrs):
     lens = [len(i) for i in arrs]
@@ -52,7 +37,7 @@ switcher = {
     4: "1 client missing 1 class (hardwareFailure)",
     5: "1 client missing 1 class (label 4)",
     6: "1 client missing 1 class (label 2)",
-    7: "1 client missing 1 class (all)"
+    7: "equal Splits"
 }
 
 per_trial_total_acc = []
@@ -63,21 +48,11 @@ per_trial_total_fed_cd = []
 per_trial_per_client_accuracy_on_cd_data = []
 
 for trial in range(total_trails):
+    total_scenarios_data = []
 
+    for i in range(6):
+        total_scenarios_data.append(buildClientFairly("Labelled_Data.csv", i))
 
-
-    total_scenarios_data = [
-        # clientBuilderForScenario1(name),
-        # clientBuilderForClassesPerEach(switcher.get(1, "nothing") + " " + "trial" + " " + str(trial)),
-        #  clientBuilderForClassesProportional(switcher.get(2, "nothing") + "trial" + str(trial)),
-        # clientBuilderForClientMissing1class(switcher.get(6, "nothing") + "trial" + str(trial))
-    ]
-
-    for j in range(6):
-        total_scenarios_data.append(buildClientWithPath('splitTest' + str(j), j))
-
-    for t in range(6):
-        total_scenarios_data.append(buildClientWithPath('nonSplitTest' + str(t), t))
 
     per_scenario_total_acc = []
 
